@@ -240,7 +240,7 @@
     </section>
 
     <!-- 2. 전월 대비 비교표 (MoM) & 코리락쿠마 응원 배너 -->
-    <section class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+    <section class="bg-white p-3.5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
         <div>
           <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
@@ -255,14 +255,14 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+        <table class="w-full text-left border-collapse text-[11px] sm:text-sm">
           <thead>
             <tr class="border-b border-cream-border text-cocoa-medium bg-cream-soft/60">
-              <th class="py-2.5 px-3 font-semibold rounded-l-xl">구분</th>
-              <th class="py-2.5 px-3 font-semibold text-right" id="thPrevMonth">전월</th>
-              <th class="py-2.5 px-3 font-semibold text-right" id="thCurrMonth">당월</th>
-              <th class="py-2.5 px-3 font-semibold text-right">증감액</th>
-              <th class="py-2.5 px-3 font-semibold text-right rounded-r-xl">증감률</th>
+              <th class="py-2 px-1.5 sm:px-3 font-semibold rounded-l-xl whitespace-nowrap">구분</th>
+              <th class="py-2 px-1.5 sm:px-3 font-semibold text-right whitespace-nowrap" id="thPrevMonth">전월</th>
+              <th class="py-2 px-1.5 sm:px-3 font-semibold text-right whitespace-nowrap" id="thCurrMonth">당월</th>
+              <th class="py-2 px-1.5 sm:px-3 font-semibold text-right whitespace-nowrap">증감액</th>
+              <th class="py-2 px-1.5 sm:px-3 font-semibold text-right rounded-r-xl whitespace-nowrap">증감률</th>
             </tr>
           </thead>
           <tbody id="momTableBody" class="divide-y divide-cream-border font-medium">
@@ -452,7 +452,7 @@
     </section>
 
     <!-- 7. 거래내역 관리 테이블 -->
-    <section class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+    <section class="bg-white p-3.5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
         <div>
           <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
@@ -484,8 +484,8 @@
         </div>
       </div>
 
-      <!-- 거래 테이블 -->
-      <div class="overflow-x-auto">
+      <!-- 거래 내역: 데스크톱 테이블 뷰 (sm 이상) -->
+      <div class="hidden sm:block overflow-x-auto">
         <table class="w-full text-left border-collapse text-xs sm:text-sm">
           <thead>
             <tr class="border-b border-cream-border text-cocoa-medium bg-cream-soft/60">
@@ -502,6 +502,11 @@
             <!-- JS 렌더링 -->
           </tbody>
         </table>
+      </div>
+
+      <!-- 거래 내역: 모바일 카드 리스트 뷰 (sm 미만: 글자 짤림 방지 및 쾌적한 1페이지 뷰) -->
+      <div id="transactionMobileList" class="sm:hidden space-y-2">
+        <!-- JS 렌더링 -->
       </div>
 
       <!-- 페이지네이션 / 건수 표시 -->
@@ -1757,8 +1762,10 @@
        7-2. MoM 전월 비교표
        -------------------------------------------------------------------------- */
     function renderMoM(currTxs, prevTxs, prevYM) {
-      document.getElementById('thPrevMonth').textContent = formatYMString(prevYM);
-      document.getElementById('thCurrMonth').textContent = formatYMString(g_selectedMonth);
+      const prevMStr = parseInt(prevYM.split('-')[1]) + '월';
+      const currMStr = parseInt(g_selectedMonth.split('-')[1]) + '월';
+      document.getElementById('thPrevMonth').innerHTML = `<span class="sm:hidden">${prevMStr}</span><span class="hidden sm:inline">${formatYMString(prevYM)}</span>`;
+      document.getElementById('thCurrMonth').innerHTML = `<span class="sm:hidden">${currMStr}</span><span class="hidden sm:inline">${formatYMString(g_selectedMonth)}</span>`;
 
       const calcSums = (txList) => {
         let income = 0, expense = 0, saving = 0;
@@ -1775,9 +1782,9 @@
       const prevSums = calcSums(prevTxs);
 
       const rows = [
-        { label: '💰 총 수입', prev: prevSums.income, curr: currSums.income, isExpense: false },
-        { label: '💸 소비지출', prev: prevSums.expense, curr: currSums.expense, isExpense: true },
-        { label: '🍯 저축 · 투자', prev: prevSums.saving, curr: currSums.saving, isExpense: false }
+        { label: '💰 총 수입', mobLabel: '💰 수입', prev: prevSums.income, curr: currSums.income, isExpense: false },
+        { label: '💸 소비지출', mobLabel: '💸 지출', prev: prevSums.expense, curr: currSums.expense, isExpense: true },
+        { label: '🍯 저축 · 투자', mobLabel: '🍯 저축', prev: prevSums.saving, curr: currSums.saving, isExpense: false }
       ];
 
       const tbody = document.getElementById('momTableBody');
@@ -1789,21 +1796,22 @@
 
         let diffColor = 'text-cocoa-medium';
         if (r.isExpense) {
-          // 지출은 감소하면 초록(절약), 증가하면 로즈
           diffColor = diff > 0 ? 'text-strawberry-rose' : (diff < 0 ? 'text-emerald-600 font-bold' : 'text-cocoa-medium');
         } else {
-          // 수입/저축은 증가하면 초록, 감소하면 로즈
           diffColor = diff > 0 ? 'text-emerald-600 font-bold' : (diff < 0 ? 'text-strawberry-rose' : 'text-cocoa-medium');
         }
 
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-cream-soft/40 transition-colors';
         tr.innerHTML = `
-          <td class="py-2.5 px-3 text-cocoa-deep font-semibold">${r.label}</td>
-          <td class="py-2.5 px-3 text-right text-cocoa-light tabular-nums">${formatCurrency(r.prev)}</td>
-          <td class="py-2.5 px-3 text-right text-cocoa-deep font-bold tabular-nums">${formatCurrency(r.curr)}</td>
-          <td class="py-2.5 px-3 text-right font-bold tabular-nums ${diffColor}">${diff > 0 ? '+' : ''}${formatCurrency(diff)}</td>
-          <td class="py-2.5 px-3 text-right font-bold tabular-nums ${diffColor}">${formatPercent(rate)}</td>
+          <td class="py-2.5 px-1.5 sm:px-3 text-cocoa-deep font-semibold whitespace-nowrap">
+            <span class="sm:hidden">${r.mobLabel}</span>
+            <span class="hidden sm:inline">${r.label}</span>
+          </td>
+          <td class="py-2.5 px-1.5 sm:px-3 text-right text-cocoa-light tabular-nums whitespace-nowrap">${formatCurrency(r.prev)}</td>
+          <td class="py-2.5 px-1.5 sm:px-3 text-right text-cocoa-deep font-bold tabular-nums whitespace-nowrap">${formatCurrency(r.curr)}</td>
+          <td class="py-2.5 px-1.5 sm:px-3 text-right font-bold tabular-nums whitespace-nowrap ${diffColor}">${diff > 0 ? '+' : ''}${formatCurrency(diff)}</td>
+          <td class="py-2.5 px-1.5 sm:px-3 text-right font-bold tabular-nums whitespace-nowrap ${diffColor}">${formatPercent(rate)}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -2204,16 +2212,27 @@
       document.getElementById('txCountBadge').textContent = `조회월 총 ${filtered.length}건의 거래 내역`;
 
       const tbody = document.getElementById('transactionTableBody');
-      tbody.innerHTML = '';
+      const mobileList = document.getElementById('transactionMobileList');
+      if (tbody) tbody.innerHTML = '';
+      if (mobileList) mobileList.innerHTML = '';
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="7" class="py-8 text-center text-cocoa-light font-medium">
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="py-8 text-center text-cocoa-light font-medium">
+                해당 조건의 거래 내역이 없습니다 🍓
+              </td>
+            </tr>
+          `;
+        }
+        if (mobileList) {
+          mobileList.innerHTML = `
+            <div class="py-8 text-center text-cocoa-light font-medium bg-cream-soft/40 rounded-2xl border border-cream-border">
               해당 조건의 거래 내역이 없습니다 🍓
-            </td>
-          </tr>
-        `;
+            </div>
+          `;
+        }
         return;
       }
 
@@ -2235,37 +2254,75 @@
           amountClass = 'text-teal-700 font-extrabold';
         }
 
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-cream-soft/50 transition-colors group';
-        tr.innerHTML = `
-          <td class="py-3 px-3 text-cocoa-medium tabular-nums whitespace-nowrap">${tx.date.substring(5)}</td>
-          <td class="py-3 px-3">${typeBadge}</td>
-          <td class="py-3 px-3">
-            <div class="font-bold text-cocoa-deep">${tx.subCategory || tx.majorCategory}</div>
-            <div class="text-[10px] text-cocoa-light">${tx.majorCategory}</div>
-          </td>
-          <td class="py-3 px-3">
-            <div class="font-semibold text-cocoa-deep text-xs">${tx.paymentMethod}</div>
-            <div class="text-[10px] text-cocoa-light">${tx.account || '-'}</div>
-          </td>
-          <td class="py-3 px-3">
-            <div class="font-medium text-cocoa-deep">${tx.description || '-'}</div>
-            ${tx.splitMemo ? `
-              <div class="mt-0.5 inline-flex items-center px-1.5 py-0.2 text-[10px] font-bold bg-milk-light text-strawberry-rose rounded border border-milk-pink">
-                👥 ${tx.splitMemo}
+        // 1) PC용 테이블 행 렌더링
+        if (tbody) {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-cream-soft/50 transition-colors group';
+          tr.innerHTML = `
+            <td class="py-3 px-3 text-cocoa-medium tabular-nums whitespace-nowrap">${tx.date.substring(5)}</td>
+            <td class="py-3 px-3">${typeBadge}</td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-cocoa-deep">${tx.subCategory || tx.majorCategory}</div>
+              <div class="text-[10px] text-cocoa-light">${tx.majorCategory}</div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-semibold text-cocoa-deep text-xs">${tx.paymentMethod}</div>
+              <div class="text-[10px] text-cocoa-light">${tx.account || '-'}</div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-medium text-cocoa-deep">${tx.description || '-'}</div>
+              ${tx.splitMemo ? `
+                <div class="mt-0.5 inline-flex items-center px-1.5 py-0.2 text-[10px] font-bold bg-milk-light text-strawberry-rose rounded border border-milk-pink">
+                  👥 ${tx.splitMemo}
+                </div>
+              ` : ''}
+            </td>
+            <td class="py-3 px-3 text-right tabular-nums ${amountClass}">
+              ${tx.type === '수입' ? '+' : (tx.type === '지출' ? '-' : '')}${formatCurrency(tx.amount)}
+            </td>
+            <td class="py-3 px-3 text-center">
+              <button onclick="deleteTransaction('${tx.id}')" class="px-2 py-1 rounded-lg text-cocoa-light hover:text-strawberry-rose hover:bg-rose-50 transition-colors text-xs font-bold" title="삭제">
+                삭제
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+
+        // 2) 모바일용 카드 뷰 렌더링 (모바일 화면 폭에 100% 맞춤, 글자 짤림 방지)
+        if (mobileList) {
+          const card = document.createElement('div');
+          card.className = 'p-3 bg-cream-soft/40 hover:bg-milk-light/20 rounded-2xl border border-cream-border/70 flex items-center justify-between transition-colors';
+          card.innerHTML = `
+            <div class="flex items-start space-x-2.5 min-w-0 pr-2">
+              <span class="text-[11px] text-cocoa-light font-bold tabular-nums shrink-0 mt-0.5">${tx.date.substring(5)}</span>
+              <div class="min-w-0">
+                <div class="flex items-center space-x-1.5 flex-wrap gap-y-0.5">
+                  ${typeBadge}
+                  <span class="font-bold text-cocoa-deep text-xs truncate max-w-[150px]">${tx.subCategory || tx.majorCategory}</span>
+                </div>
+                <div class="text-xs text-cocoa-deep font-medium mt-1 truncate max-w-[180px]">
+                  ${tx.description || '-'}
+                </div>
+                <div class="text-[10px] text-cocoa-light flex items-center space-x-1 mt-0.5 flex-wrap">
+                  <span class="font-semibold text-cocoa-medium">${tx.paymentMethod}</span>
+                  ${tx.account ? `<span>· ${tx.account}</span>` : ''}
+                  ${tx.splitMemo ? `<span class="px-1 bg-milk-light text-strawberry-rose rounded font-bold text-[9px]">👥 ${tx.splitMemo}</span>` : ''}
+                </div>
               </div>
-            ` : ''}
-          </td>
-          <td class="py-3 px-3 text-right tabular-nums ${amountClass}">
-            ${tx.type === '수입' ? '+' : (tx.type === '지출' ? '-' : '')}${formatCurrency(tx.amount)}
-          </td>
-          <td class="py-3 px-3 text-center">
-            <button onclick="deleteTransaction('${tx.id}')" class="px-2 py-1 rounded-lg text-cocoa-light hover:text-strawberry-rose hover:bg-rose-50 transition-colors text-xs font-bold" title="삭제">
-              삭제
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
+            </div>
+
+            <div class="text-right shrink-0 flex flex-col items-end justify-between space-y-1.5 pl-1">
+              <div class="text-xs sm:text-sm font-extrabold tabular-nums ${amountClass}">
+                ${tx.type === '수입' ? '+' : (tx.type === '지출' ? '-' : '')}${formatCurrency(tx.amount)}
+              </div>
+              <button onclick="deleteTransaction('${tx.id}')" class="text-[10px] text-cocoa-light hover:text-strawberry-rose px-2 py-0.5 rounded-lg bg-white border border-cream-border font-bold transition-colors shadow-2xs">
+                삭제
+              </button>
+            </div>
+          `;
+          mobileList.appendChild(card);
+        }
       });
     }
 
