@@ -109,21 +109,30 @@
       <div class="flex items-center justify-between h-20">
         
         <!-- 로고 및 타이틀 -->
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="scrollToTop()">
-          <div class="relative w-12 h-12 rounded-full bg-gradient-to-br from-milk-light via-milk-pink to-strawberry-rose p-0.5 shadow-md flex items-center justify-center">
-            <div class="w-full h-full bg-white rounded-full flex items-center justify-center text-2xl shadow-inner">
+        <div class="flex items-center space-x-3">
+          <div class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-milk-light via-milk-pink to-strawberry-rose p-0.5 shadow-md flex items-center justify-center cursor-pointer" onclick="scrollToTop()">
+            <div class="w-full h-full bg-white rounded-full flex items-center justify-center text-xl sm:text-2xl shadow-inner">
               🍓
             </div>
-            <span class="absolute -top-1 -right-1 flex h-4 w-4">
+            <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-strawberry-rose opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-4 w-4 bg-strawberry-rose text-[9px] text-white font-bold items-center justify-center">🎀</span>
+              <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-strawberry-rose text-[8px] text-white font-bold items-center justify-center">🎀</span>
             </span>
           </div>
           <div>
-            <div class="flex items-center space-x-1.5">
-              <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-cocoa-deep font-cute-title text-2xl sm:text-3xl leading-none">
+            <div class="flex items-center space-x-1.5 cursor-pointer" onclick="scrollToTop()">
+              <h1 class="text-base sm:text-lg font-bold text-cocoa-deep font-cute-title leading-tight tracking-normal">
                 🍓 my jju archive 🎀
               </h1>
+            </div>
+
+            <!-- 오늘의 BGM (클릭 시 기분에 따라 변경 가능) -->
+            <div class="flex items-center mt-0.5">
+              <button onclick="editBgm()" class="group inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-milk-light/90 hover:bg-milk-light text-strawberry-rose border border-milk-pink transition-all shadow-2xs" title="클릭해서 오늘의 노래 변경하기 🎵">
+                <span class="mr-1 text-[11px] animate-pulse">🎧</span>
+                <span id="bgmDisplay" class="font-medium">아일릿 (ILLIT) - My World 🍓</span>
+                <span class="ml-1 text-[9px] text-cocoa-light opacity-50 group-hover:opacity-100 transition-opacity">✏️</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1375,13 +1384,15 @@
       ASSETS: 'korila_smart_ledger_assets_v2',
       SELECTED_MONTH: 'korila_smart_ledger_month_v2',
       STOCKS: 'korila_smart_ledger_stocks_v2',
-      PAYMENTS: 'korila_smart_ledger_payments_v2'
+      PAYMENTS: 'korila_smart_ledger_payments_v2',
+      BGM: 'my_jju_bgm_v1'
     };
 
     let g_transactions = [];
     let g_assets = [];
     let g_stocks = [];
     let g_paymentMethods = [];
+    let g_bgm = '아일릿 (ILLIT) - My World 🍓';
     let g_selectedMonth = '';
 
     // Chart.js 인스턴스들
@@ -1443,24 +1454,47 @@
         savePaymentMethods();
       }
 
-      // 5) 선택 연월 설정 (기본 당월)
+      // 5) BGM 로드
+      const savedBgm = localStorage.getItem(STORAGE_KEYS.BGM);
+      if (savedBgm) {
+        g_bgm = savedBgm;
+      }
+      const bgmElem = document.getElementById('bgmDisplay');
+      if (bgmElem) {
+        bgmElem.textContent = g_bgm;
+      }
+
+      // 6) 선택 연월 설정 (기본 당월)
       const now = new Date();
       const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       const savedMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH);
       g_selectedMonth = savedMonth || currentYM;
 
-      // 6) UI 셀렉트 및 폼 초기 세팅
+      // 7) UI 셀렉트 및 폼 초기 세팅
       initMonthDropdown();
       initFormOptions();
       initFilterDropdowns();
 
-      // 7) 전체 대시보드 렌더링
+      // 8) 전체 대시보드 렌더링
       renderAll();
 
-      // 8) 실시간 주식 시세 백그라운드 자동 갱신
+      // 9) 실시간 주식 시세 백그라운드 자동 갱신
       setTimeout(() => {
         refreshAllStockPrices(false);
       }, 500);
+    }
+
+    function editBgm() {
+      const current = g_bgm || '아일릿 (ILLIT) - My World 🍓';
+      const updated = prompt('오늘의 기분이나 듣고 싶은 BGM을 입력해주세요 🎵\n(예: 아일릿 - My World 🍓)', current);
+      if (updated !== null && updated.trim() !== '') {
+        g_bgm = updated.trim();
+        localStorage.setItem(STORAGE_KEYS.BGM, g_bgm);
+        const bgmElem = document.getElementById('bgmDisplay');
+        if (bgmElem) {
+          bgmElem.textContent = g_bgm;
+        }
+      }
     }
 
     function saveTransactions() {
