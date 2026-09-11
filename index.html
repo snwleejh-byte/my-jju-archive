@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>코리락쿠마 스마트 가계부 🍓🎀 Korilakkuma Ledger</title>
+  <title>my jju archive 🍓🎀</title>
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍓</text></svg>">
   
@@ -121,11 +121,11 @@
           <div>
             <div class="flex items-center space-x-1.5">
               <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-cocoa-deep font-cute-title text-2xl sm:text-3xl leading-none">
-                🍓 코리락쿠마 스마트 가계부 🎀
+                🍓 my jju archive 🎀
               </h1>
             </div>
             <p class="text-xs text-cocoa-medium hidden sm:block font-medium">
-              딸기 밀크처럼 달콤하고 깔끔한 스마트 자산관리
+              딸기 밀크처럼 달콤하고 깔끔한 나만의 스마트 아카이브
             </p>
           </div>
         </div>
@@ -360,7 +360,70 @@
       </div>
     </section>
 
-    <!-- 6. 거래내역 관리 테이블 -->
+    <!-- 6. 보유 주식 & ETF 실시간 전광판 (네이버 증권 시세 연동) -->
+    <section class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+      <!-- 섹션 헤더 & 액션 버튼 -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <div class="flex items-center space-x-2">
+            <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+              <span>📈</span>
+              <span>보유 주식 & ETF 실시간 전광판</span>
+            </h3>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-milk-light text-strawberry-rose border border-milk-pink">
+              실시간 자동 갱신 🍓
+            </span>
+          </div>
+          <p class="text-xs text-cocoa-light mt-0.5">네이버 증권 연동 실시간 현재가, 오늘 등락률 및 내 실시간 수익률</p>
+        </div>
+
+        <div class="flex items-center space-x-2 self-start sm:self-auto">
+          <!-- 실시간 시세 갱신 버튼 -->
+          <button onclick="refreshAllStockPrices()" id="btnRefreshStock" class="flex items-center space-x-1.5 px-3 py-1.5 bg-cream-soft hover:bg-milk-light border border-cream-border rounded-xl text-xs font-bold text-cocoa-deep transition-all">
+            <span id="stockRefreshSpinner" class="text-sm">🔄</span>
+            <span>시세 새로고침</span>
+          </button>
+
+          <!-- 새 종목 등록 버튼 -->
+          <button onclick="openStockModal()" class="flex items-center space-x-1 px-3.5 py-1.5 bg-gradient-to-r from-strawberry-rose to-milk-pink hover:from-strawberry-dark hover:to-strawberry-rose text-white rounded-xl shadow-korila-btn text-xs font-bold transition-all transform active:scale-95">
+            <span>➕</span>
+            <span>새 종목 등록</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 포트폴리오 요약 바 -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3.5 bg-cream-soft rounded-2xl border border-cream-border mb-4 text-center">
+        <div>
+          <span class="text-[11px] text-cocoa-light block font-medium">총 투자원금</span>
+          <span id="stockTotalCost" class="font-extrabold text-cocoa-deep tabular-nums text-sm sm:text-base">0원</span>
+        </div>
+        <div>
+          <span class="text-[11px] text-cocoa-light block font-medium">총 평가금액</span>
+          <span id="stockTotalValue" class="font-extrabold text-cocoa-deep tabular-nums text-sm sm:text-base">0원</span>
+        </div>
+        <div>
+          <span class="text-[11px] text-cocoa-light block font-medium">총 평가손익</span>
+          <span id="stockTotalProfit" class="font-extrabold text-strawberry-rose tabular-nums text-sm sm:text-base">0원</span>
+        </div>
+        <div>
+          <span class="text-[11px] text-cocoa-light block font-medium">총 수익률</span>
+          <span id="stockTotalReturnRate" class="font-extrabold text-strawberry-rose tabular-nums text-sm sm:text-base">0.0%</span>
+        </div>
+      </div>
+
+      <!-- 종목 카드 그리드 목록 -->
+      <div id="stockCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- JS 렌더링 -->
+      </div>
+      
+      <div class="mt-3 flex items-center justify-between text-[11px] text-cocoa-light pt-2 border-t border-cream-border">
+        <span id="stockLastUpdatedTime">마지막 시세 갱신: 로딩 중...</span>
+        <span>각 종목의 [네이버증권 🔍]을 누르면 실시간 차트로 바로 이동합니다.</span>
+      </div>
+    </section>
+
+    <!-- 7. 거래내역 관리 테이블 -->
     <section class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
         <div>
@@ -427,7 +490,7 @@
   <!-- ==================== FOOTER ==================== -->
   <footer class="mt-12 py-8 bg-white border-t border-cream-border text-center text-xs text-cocoa-light">
     <div class="max-w-7xl mx-auto px-4 space-y-2">
-      <p class="font-cute-title text-base text-strawberry-rose">🍓 코리락쿠마 딸기 밀크 스마트 가계부 🎀</p>
+      <p class="font-cute-title text-base text-strawberry-rose">🍓 my jju archive 🎀</p>
       <p>모든 데이터는 브라우저 내(localStorage)에 안전하게 저장되며 외부 서버로 전송되지 않습니다.</p>
       <p class="text-[11px] text-cocoa-border">Designed with Cream Ivory, Strawberry Rose & Cocoa Brown Palette</p>
     </div>
@@ -613,6 +676,78 @@
     </div>
   </div>
 
+  <!-- ==================== 새 종목 등록 모달 ==================== -->
+  <div id="stockModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cocoa-deep/50 backdrop-blur-xs hidden transition-opacity">
+    <div class="bg-white rounded-3xl border border-cream-border shadow-2xl w-full max-w-md overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- 모달 헤더 -->
+      <div class="bg-gradient-to-r from-milk-subtle via-cream-ivory to-milk-light px-6 py-4 border-b border-cream-border flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">📈</span>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-cocoa-deep">새 주식 / ETF 종목 등록</h3>
+            <p class="text-[11px] text-cocoa-light">네이버 증권 종목코드 입력 시 실시간 시세 연동</p>
+          </div>
+        </div>
+        <button onclick="closeStockModal()" class="w-8 h-8 rounded-full bg-white/80 hover:bg-white text-cocoa-medium flex items-center justify-center font-bold text-sm shadow-xs transition-colors">
+          ✕
+        </button>
+      </div>
+
+      <!-- 모달 폼 -->
+      <form id="stockForm" onsubmit="handleStockSubmit(event)" class="p-6 space-y-3.5 text-xs sm:text-sm">
+        
+        <!-- 종목명 & 종목코드 -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">종목명 🏷️</label>
+            <input type="text" id="inputStockName" required placeholder="예: 삼성전자" class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose">
+          </div>
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">종목코드(티커) 🔍</label>
+            <input type="text" id="inputStockCode" required placeholder="예: 005930 또는 AAPL" class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose uppercase">
+          </div>
+        </div>
+        <p class="text-[10px] text-cocoa-light -mt-1">* 국내주식은 6자리 숫자(예: 005930, 360750), 미국주식은 티커(예: AAPL)</p>
+
+        <!-- 연결 계좌 -->
+        <div>
+          <label class="block font-bold text-cocoa-deep mb-1">보유 증권계좌 🏦</label>
+          <select id="inputStockAccount" required class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose cursor-pointer">
+            <option value="키움증권 ISA 계좌">키움증권 ISA 계좌</option>
+            <option value="키움증권 일반 증권계좌">키움증권 일반 증권계좌</option>
+            <option value="토스증권 계좌">토스증권 계좌</option>
+            <option value="기타 증권계좌">기타 증권계좌</option>
+          </select>
+        </div>
+
+        <!-- 매수단가 & 수량 -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">매수단가 (원) 💵</label>
+            <input type="number" id="inputStockBuyPrice" required min="1" step="1" placeholder="예: 72000" class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-extrabold focus:outline-none focus:ring-2 focus:ring-strawberry-rose tabular-nums">
+          </div>
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">보유 수량 (주) 📊</label>
+            <input type="number" id="inputStockQty" required min="1" step="any" placeholder="예: 10" class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-extrabold focus:outline-none focus:ring-2 focus:ring-strawberry-rose tabular-nums">
+          </div>
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div class="pt-3 flex items-center space-x-2">
+          <button type="button" onclick="closeStockModal()" class="w-1/3 py-2.5 rounded-xl border border-cream-border bg-cream-soft text-cocoa-medium font-bold hover:bg-cream-border transition-colors">
+            취소
+          </button>
+          <button type="submit" class="w-2/3 py-2.5 rounded-xl bg-gradient-to-r from-strawberry-rose to-milk-pink hover:from-strawberry-dark hover:to-strawberry-rose text-white font-bold shadow-korila-btn transition-all transform active:scale-98 flex items-center justify-center space-x-1">
+            <span>🍓</span>
+            <span>포트폴리오에 등록</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
 
   <!-- ==================== JAVASCRIPT ==================== -->
   <script>
@@ -726,6 +861,43 @@
       { id: 'acc_9', group: '투자/증권', name: '키움증권 ISA 계좌', balance: 5200000 },
       { id: 'acc_10', group: '투자/증권', name: '키움증권 일반 증권계좌', balance: 4100000 },
       { id: 'acc_11', group: '투자/증권', name: '토스증권 계좌', balance: 2850000 }
+    ];
+
+    // 보유 주식 및 ETF 초기 데이터
+    const INITIAL_STOCKS = [
+      {
+        id: 'stock_1',
+        name: 'TIGER 미국S&P500',
+        code: '360750',
+        account: '키움증권 ISA 계좌',
+        buyPrice: 17200,
+        qty: 35,
+        currentPrice: 19850,
+        changeRate: 1.28,
+        currency: 'KRW'
+      },
+      {
+        id: 'stock_2',
+        name: '삼성전자',
+        code: '005930',
+        account: '키움증권 일반 증권계좌',
+        buyPrice: 71500,
+        qty: 15,
+        currentPrice: 75200,
+        changeRate: 0.94,
+        currency: 'KRW'
+      },
+      {
+        id: 'stock_3',
+        name: '애플 (Apple Inc)',
+        code: 'AAPL',
+        account: '토스증권 계좌',
+        buyPrice: 245000,
+        qty: 4,
+        currentPrice: 298000,
+        changeRate: 2.15,
+        currency: 'KRW'
+      }
     ];
 
     /* ==========================================================================
@@ -1083,11 +1255,13 @@
     const STORAGE_KEYS = {
       TRANSACTIONS: 'korila_smart_ledger_txs_v2',
       ASSETS: 'korila_smart_ledger_assets_v2',
-      SELECTED_MONTH: 'korila_smart_ledger_month_v2'
+      SELECTED_MONTH: 'korila_smart_ledger_month_v2',
+      STOCKS: 'korila_smart_ledger_stocks_v2'
     };
 
     let g_transactions = [];
     let g_assets = [];
+    let g_stocks = [];
     let g_selectedMonth = '';
 
     // Chart.js 인스턴스들
@@ -1123,19 +1297,37 @@
         saveAssets();
       }
 
-      // 3) 선택 연월 설정 (기본 당월)
+      // 3) 주식 포트폴리오 로드
+      const savedStocks = localStorage.getItem(STORAGE_KEYS.STOCKS);
+      if (savedStocks) {
+        try {
+          g_stocks = JSON.parse(savedStocks);
+        } catch (e) {
+          g_stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
+        }
+      } else {
+        g_stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
+        saveStocks();
+      }
+
+      // 4) 선택 연월 설정 (기본 당월)
       const now = new Date();
       const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       const savedMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH);
       g_selectedMonth = savedMonth || currentYM;
 
-      // 4) UI 셀렉트 및 폼 초기 세팅
+      // 5) UI 셀렉트 및 폼 초기 세팅
       initMonthDropdown();
       initFormOptions();
       initFilterDropdowns();
 
-      // 5) 전체 대시보드 렌더링
+      // 6) 전체 대시보드 렌더링
       renderAll();
+
+      // 7) 실시간 주식 시세 백그라운드 자동 갱신
+      setTimeout(() => {
+        refreshAllStockPrices(false);
+      }, 500);
     }
 
     function saveTransactions() {
@@ -1144,6 +1336,10 @@
 
     function saveAssets() {
       localStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify(g_assets));
+    }
+
+    function saveStocks() {
+      localStorage.setItem(STORAGE_KEYS.STOCKS, JSON.stringify(g_stocks));
     }
 
     function saveSelectedMonth() {
@@ -1321,7 +1517,10 @@
       // 5) 최근 12개월 추이 꺾은선 차트
       renderTrendChart();
 
-      // 6) 거래내역 테이블
+      // 6) 보유 주식 및 ETF 전광판
+      renderStocks();
+
+      // 7) 거래내역 테이블
       applyTxFilters();
     }
 
@@ -2013,17 +2212,302 @@
     }
 
     /* ==========================================================================
-       10. 초기 데이터 리셋
+       10. 보유 주식 & ETF 실시간 전광판 로직 (네이버 증권 연동)
+       ========================================================================== */
+    function renderStocks() {
+      const grid = document.getElementById('stockCardGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      let totalCost = 0;
+      let totalValue = 0;
+
+      if (!g_stocks || g_stocks.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-8 text-center text-cocoa-light bg-cream-soft rounded-2xl border border-cream-border">
+            등록된 주식 / ETF 종목이 없습니다. [➕ 새 종목 등록] 버튼을 눌러보세요 🍓
+          </div>
+        `;
+      } else {
+        g_stocks.forEach(st => {
+          const cost = (Number(st.buyPrice) || 0) * (Number(st.qty) || 0);
+          const currentPrice = Number(st.currentPrice) || Number(st.buyPrice) || 0;
+          const value = currentPrice * (Number(st.qty) || 0);
+          const profit = value - cost;
+          const returnRate = cost > 0 ? (profit / cost) * 100 : 0;
+          const changeRate = Number(st.changeRate) || 0;
+
+          totalCost += cost;
+          totalValue += value;
+
+          // 등락 색상 & 기호 (상승: 레드/로즈, 하락: 블루/쿨, 보합: 코코아)
+          const isUp = changeRate > 0;
+          const isDown = changeRate < 0;
+          const changeColor = isUp ? 'text-strawberry-rose' : (isDown ? 'text-blue-600' : 'text-cocoa-medium');
+          const changeIcon = isUp ? '🔺' : (isDown ? '🔻' : '➖');
+
+          // 내 수익률 색상
+          const profitColor = profit > 0 ? 'text-strawberry-rose font-bold' : (profit < 0 ? 'text-blue-600 font-bold' : 'text-cocoa-deep font-bold');
+
+          // 네이버 증권 링크 (국내: 6자리, 해외: 티커)
+          const isDomestic = /^\d{6}$/.test(st.code);
+          const naverLink = isDomestic 
+            ? `https://m.stock.naver.com/domestic/stock/${st.code}/total`
+            : `https://m.stock.naver.com/worldstock/stock/${st.code}/total`;
+
+          const card = document.createElement('div');
+          card.className = 'p-4 rounded-2xl bg-cream-soft border border-cream-border hover:bg-white hover:shadow-korila-card transition-all flex flex-col justify-between';
+          card.innerHTML = `
+            <div>
+              <!-- 종목 헤더 -->
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <div class="flex items-center space-x-1.5">
+                    <span class="font-bold text-cocoa-deep text-sm sm:text-base">${st.name}</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-cream-ivory text-cocoa-light border border-cream-border font-mono font-bold">${st.code}</span>
+                  </div>
+                  <span class="text-[10px] text-cocoa-light">${st.account || '증권계좌'}</span>
+                </div>
+                <!-- 오늘 실시간 등락률 뱃지 -->
+                <div class="text-right">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-extrabold ${changeColor} bg-white border border-cream-border shadow-2xs tabular-nums">
+                    ${changeIcon} ${isUp ? '+' : ''}${changeRate.toFixed(2)}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- 현재가 & 매수가/수량 요약 -->
+              <div class="grid grid-cols-2 gap-2 my-2.5 p-2 bg-white/90 rounded-xl border border-cream-border text-xs">
+                <div>
+                  <span class="text-[10px] text-cocoa-light block">실시간 현재가</span>
+                  <span class="font-extrabold text-cocoa-deep tabular-nums text-sm">${formatCurrency(currentPrice)}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-cocoa-light block">보유 수량 (평단)</span>
+                  <span class="font-bold text-cocoa-deep tabular-nums">${st.qty}주 (${formatShortCurrency(st.buyPrice)})</span>
+                </div>
+              </div>
+
+              <!-- 평가손익 & 총 평가금액 -->
+              <div class="flex items-center justify-between text-xs pt-1">
+                <span class="text-cocoa-light">총 평가액</span>
+                <span class="font-extrabold text-cocoa-deep tabular-nums">${formatCurrency(value)}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs mt-0.5">
+                <span class="text-cocoa-light">내 평가손익</span>
+                <span class="tabular-nums ${profitColor}">
+                  ${profit > 0 ? '+' : ''}${formatCurrency(profit)} (${profit > 0 ? '+' : ''}${returnRate.toFixed(1)}%)
+                </span>
+              </div>
+            </div>
+
+            <!-- 하단 바로가기 및 액션 버튼 -->
+            <div class="flex items-center justify-between mt-3 pt-2.5 border-t border-cream-border/60">
+              <a href="${naverLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-[11px] font-bold border border-green-200 transition-colors">
+                <span>네이버증권</span>
+                <span>🔍</span>
+              </a>
+
+              <button onclick="deleteStock('${st.id}')" class="text-[11px] text-cocoa-light hover:text-strawberry-rose transition-colors px-1.5 py-0.5">
+                삭제
+              </button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      // 상단 총계 갱신
+      const totalProfit = totalValue - totalCost;
+      const totalRate = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
+
+      document.getElementById('stockTotalCost').textContent = formatCurrency(totalCost);
+      document.getElementById('stockTotalValue').textContent = formatCurrency(totalValue);
+      
+      const profitElem = document.getElementById('stockTotalProfit');
+      profitElem.textContent = `${totalProfit > 0 ? '+' : ''}${formatCurrency(totalProfit)}`;
+      profitElem.className = `font-extrabold tabular-nums text-sm sm:text-base ${totalProfit > 0 ? 'text-strawberry-rose' : (totalProfit < 0 ? 'text-blue-600' : 'text-cocoa-deep')}`;
+
+      const rateElem = document.getElementById('stockTotalReturnRate');
+      rateElem.textContent = `${totalRate > 0 ? '+' : ''}${totalRate.toFixed(1)}%`;
+      rateElem.className = `font-extrabold tabular-nums text-sm sm:text-base ${totalRate > 0 ? 'text-strawberry-rose' : (totalRate < 0 ? 'text-blue-600' : 'text-cocoa-deep')}`;
+    }
+
+    // 네이버 및 금융 시세 실시간 조회 함수
+    async function fetchRealtimeStockPrice(code) {
+      if (!code) return null;
+      const cleanCode = code.trim().toUpperCase();
+
+      // 1) 국내 주식 6자리 숫자 (네이버 증권 모바일 API)
+      if (/^\d{6}$/.test(cleanCode)) {
+        try {
+          const targetUrl = `https://m.stock.naver.com/api/stock/${cleanCode}/basic`;
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+          const response = await fetch(proxyUrl, { cache: 'no-store' });
+          if (response.ok) {
+            const data = await response.json();
+            const nowPrice = Number(String(data.nowPrice || data.closePrice || 0).replace(/,/g, ''));
+            const changeRate = Number(data.fluctuationRate || 0);
+            if (nowPrice > 0) {
+              return { price: nowPrice, changeRate };
+            }
+          }
+        } catch (err) {
+          console.warn('네이버 실시간 시세 조회 대체 모드:', err);
+        }
+      } else {
+        // 2) 미국 및 해외 주식 (Yahoo Finance API)
+        try {
+          const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${cleanCode}`;
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+          const response = await fetch(proxyUrl, { cache: 'no-store' });
+          if (response.ok) {
+            const data = await response.json();
+            const meta = data.chart?.result?.[0]?.meta;
+            if (meta) {
+              const usdPrice = Number(meta.regularMarketPrice || 0);
+              const prevClose = Number(meta.chartPreviousClose || meta.previousClose || usdPrice);
+              const changeRate = prevClose > 0 ? ((usdPrice - prevClose) / prevClose) * 100 : 0;
+              // 원화 환산 (기본 환율 약 1,350원 기준)
+              const krwPrice = Math.round(usdPrice * 1350);
+              return { price: krwPrice, changeRate };
+            }
+          }
+        } catch (err) {
+          console.warn('해외 실시간 시세 조회 대체 모드:', err);
+        }
+      }
+      return null;
+    }
+
+    // 전체 보유 종목 실시간 시세 갱신
+    async function refreshAllStockPrices(showToast = true) {
+      const spinner = document.getElementById('stockRefreshSpinner');
+      if (spinner) spinner.classList.add('animate-spin');
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      const timeLabel = document.getElementById('stockLastUpdatedTime');
+      if (timeLabel) timeLabel.textContent = `실시간 시세 조회 중... (${timeStr})`;
+
+      let updatedCount = 0;
+
+      for (let st of g_stocks) {
+        try {
+          const res = await fetchRealtimeStockPrice(st.code);
+          if (res && res.price > 0) {
+            st.currentPrice = res.price;
+            st.changeRate = res.changeRate;
+            updatedCount++;
+          }
+        } catch (e) {
+          console.warn('종목 시세 갱신 스킵:', st.name);
+        }
+      }
+
+      saveStocks();
+      renderStocks();
+
+      if (spinner) spinner.classList.remove('animate-spin');
+      if (timeLabel) {
+        timeLabel.textContent = `마지막 시세 갱신: 오늘 ${timeStr} (${g_stocks.length}개 종목 완료) 🍓✨`;
+      }
+
+      if (showToast) {
+        alert('실시간 주식 및 ETF 시세가 성공적으로 갱신되었습니다! 🍓📈');
+      }
+    }
+
+    // 새 종목 모달 핸들러
+    function openStockModal() {
+      document.getElementById('stockModal').classList.remove('hidden');
+    }
+
+    function closeStockModal() {
+      document.getElementById('stockModal').classList.add('hidden');
+    }
+
+    async function handleStockSubmit(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('inputStockName').value.trim();
+      const code = document.getElementById('inputStockCode').value.trim().toUpperCase();
+      const account = document.getElementById('inputStockAccount').value;
+      const buyPrice = Number(document.getElementById('inputStockBuyPrice').value) || 0;
+      const qty = Number(document.getElementById('inputStockQty').value) || 0;
+
+      if (!name || !code || buyPrice <= 0 || qty <= 0) {
+        alert('모든 정보를 올바르게 입력해주세요.');
+        return;
+      }
+
+      // 새 종목 객체 생성 (기본 현재가는 매수가로 시작)
+      const newStock = {
+        id: `stock-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        name,
+        code,
+        account,
+        buyPrice,
+        qty,
+        currentPrice: buyPrice,
+        changeRate: 0.0,
+        currency: 'KRW'
+      };
+
+      g_stocks.unshift(newStock);
+      saveStocks();
+      renderStocks();
+      closeStockModal();
+
+      // 등록 축하 컨페티
+      if (window.confetti) {
+        confetti({
+          particleCount: 40,
+          spread: 50,
+          origin: { y: 0.7 },
+          colors: ['#C94A6E', '#F4ACB7', '#F5CB5C']
+        });
+      }
+
+      // 폼 리셋
+      document.getElementById('inputStockName').value = '';
+      document.getElementById('inputStockCode').value = '';
+      document.getElementById('inputStockBuyPrice').value = '';
+      document.getElementById('inputStockQty').value = '';
+
+      // 새로 등록된 종목의 실시간 시세를 백그라운드에서 즉시 조회
+      const latest = await fetchRealtimeStockPrice(code);
+      if (latest && latest.price > 0) {
+        newStock.currentPrice = latest.price;
+        newStock.changeRate = latest.changeRate;
+        saveStocks();
+        renderStocks();
+      }
+
+      alert(`'${name}' 종목이 포트폴리오에 성공적으로 등록되었습니다! 🍓✨`);
+    }
+
+    function deleteStock(id) {
+      if (!confirm('정말 이 종목을 포트폴리오에서 삭제하시겠어요? 🍓')) return;
+      g_stocks = g_stocks.filter(s => s.id !== id);
+      saveStocks();
+      renderStocks();
+    }
+
+    /* ==========================================================================
+       11. 초기 데이터 리셋
        ========================================================================== */
     function resetAllDataConfirm() {
       if (!confirm('초기 샘플 데이터로 복구하시겠습니까? 현재 입력된 모든 내역이 초기화됩니다.')) return;
       g_transactions = generateSampleTransactions();
       g_assets = JSON.parse(JSON.stringify(INITIAL_ASSETS));
+      g_stocks = JSON.parse(JSON.stringify(INITIAL_STOCKS));
       saveTransactions();
       saveAssets();
+      saveStocks();
       initFormOptions();
       renderAll();
-      alert('코리락쿠마 샘플 데이터로 복구 완료되었습니다! 🍓');
+      alert('my jju archive 샘플 데이터로 복구 완료되었습니다! 🍓');
     }
 
     // 창 로드 시 실행
