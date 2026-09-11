@@ -250,10 +250,47 @@
       </div>
     </section>
 
-    <!-- 3. 카드별 실적 현황판 & Chart.js 막대 차트 -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- 좌측: 카드별 실적 프로그레스 카드 (7칸) -->
-      <div class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+    <!-- 3. 시각화 분석 차트 존: 카테고리별 도넛 차트 & 카드별 사용액 막대 차트 (1:1 나란히) -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- 1) 카테고리별 지출 비중 도넛 차트 -->
+      <div class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+              <span>🍩</span>
+              <span>카테고리별 지출 비중</span>
+            </h3>
+            <p class="text-xs text-cocoa-light">어디에 가장 많이 소비했을까요?</p>
+          </div>
+          <span id="totalExpenseBadge" class="text-xs font-bold text-strawberry-rose bg-rose-50 px-2.5 py-1 rounded-full">총 0원</span>
+        </div>
+        <div class="relative w-full h-64 sm:h-72 flex items-center justify-center">
+          <canvas id="categoryDonutChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 2) 카드별 사용액 비교 막대 차트 -->
+      <div class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+              <span>📊</span>
+              <span>카드별 사용액 비교</span>
+            </h3>
+            <p class="text-xs text-cocoa-light">당월 결제수단별 지출 분포</p>
+          </div>
+          <span class="text-xs font-bold text-strawberry-rose bg-milk-light px-2.5 py-1 rounded-full">지출 집계</span>
+        </div>
+        <div class="relative w-full h-64 sm:h-72 flex items-center justify-center">
+          <canvas id="cardBarChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 상세 현황 & 랭킹 분석 존: 카드별 당월 실적 현황판 & 지출 대분류 랭킹 (1:1 나란히) -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- 1) 카드별 당월 실적 현황판 -->
+      <div class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
         <div class="flex items-center justify-between mb-4">
           <div>
             <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
@@ -262,66 +299,35 @@
             </h3>
             <p class="text-xs text-cocoa-light">목표 금액 달성 시 혜택 및 실적 완료 체크</p>
           </div>
-          <span class="text-xs font-bold text-strawberry-rose bg-milk-light px-2.5 py-1 rounded-full">당월 기준</span>
+          <span class="text-xs font-bold text-strawberry-rose bg-milk-light px-2.5 py-1 rounded-full">실적 게이지</span>
         </div>
 
-        <div id="cardPerformanceList" class="space-y-3.5">
+        <div id="cardPerformanceList" class="space-y-3 max-h-[380px] overflow-y-auto custom-scrollbar pr-1">
           <!-- JS 렌더링 -->
         </div>
       </div>
 
-      <!-- 우측: Chart.js 카드별 사용액 막대 차트 (5칸) -->
-      <div class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card flex flex-col justify-between">
-        <div class="mb-2">
-          <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
-            <span>📈</span>
-            <span>카드별 사용액 비교</span>
-          </h3>
-          <p class="text-xs text-cocoa-light">당월 결제수단별 지출 분포 (Chart.js)</p>
-        </div>
-        <div class="relative w-full h-64 sm:h-72 flex items-center justify-center">
-          <canvas id="cardBarChart"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4. 카테고리별 지출 분석 (도넛 차트 & 대분류 표) -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- 도넛 차트 (5칸) -->
-      <div class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card flex flex-col justify-between">
-        <div class="mb-2">
-          <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
-            <span>🍩</span>
-            <span>카테고리별 지출 비중</span>
-          </h3>
-          <p class="text-xs text-cocoa-light">어디에 가장 많이 소비했을까요?</p>
-        </div>
-        <div class="relative w-full h-64 sm:h-72 flex items-center justify-center">
-          <canvas id="categoryDonutChart"></canvas>
-        </div>
-      </div>
-
-      <!-- 대분류별 지출액 및 비중 테이블 (7칸) -->
-      <div class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+      <!-- 2) 지출 대분류 랭킹 테이블 -->
+      <div class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
         <div class="flex items-center justify-between mb-4">
           <div>
             <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
               <span>🍽️</span>
               <span>지출 대분류 랭킹</span>
             </h3>
-            <p class="text-xs text-cocoa-light">소비 항목별 금액 및 점유율</p>
+            <p class="text-xs text-cocoa-light">소비 항목별 금액 및 점유율 현황</p>
           </div>
-          <span id="totalExpenseBadge" class="text-xs font-bold text-strawberry-rose bg-rose-50 px-2.5 py-1 rounded-full">총 0원</span>
+          <span class="text-xs font-bold text-cocoa-medium bg-cream-soft px-2.5 py-1 rounded-full">비중 순</span>
         </div>
 
-        <div class="overflow-x-auto max-h-72 custom-scrollbar">
+        <div class="overflow-x-auto max-h-[380px] overflow-y-auto custom-scrollbar">
           <table class="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead class="sticky top-0 bg-white">
+            <thead class="sticky top-0 bg-white shadow-xs">
               <tr class="border-b border-cream-border text-cocoa-medium">
-                <th class="py-2 px-3 font-semibold">대분류</th>
-                <th class="py-2 px-3 font-semibold text-right">지출액</th>
-                <th class="py-2 px-3 font-semibold text-right">비중</th>
-                <th class="py-2 px-3 font-semibold">비중 그래프</th>
+                <th class="py-2.5 px-3 font-semibold">대분류</th>
+                <th class="py-2.5 px-3 font-semibold text-right">지출액</th>
+                <th class="py-2.5 px-3 font-semibold text-right">비중</th>
+                <th class="py-2.5 px-3 font-semibold">비중 그래프</th>
               </tr>
             </thead>
             <tbody id="categoryTableBody" class="divide-y divide-cream-border font-medium">
