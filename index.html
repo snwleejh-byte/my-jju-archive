@@ -1,0 +1,2027 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코리락쿠마 스마트 가계부 🍓🎀 Korilakkuma Ledger</title>
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍓</text></svg>">
+  
+  <!-- Pretendard & Gaegu Web Fonts -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // 코리락쿠마 딸기 밀크 테마 색상 정의
+            strawberry: {
+              rose: '#C94A6E',    // 주 포인트 / 강조 (스트로베리 로즈)
+              dark: '#A63654',
+              soft: '#E86A8D',
+              light: '#F8B4C4',
+            },
+            milk: {
+              pink: '#F4ACB7',    // 보조 / 버튼 / 뱃지 (딸기우유 핑크)
+              light: '#FFE5EC',
+              subtle: '#FFF0F3',
+            },
+            cream: {
+              ivory: '#FDFBF7',   // 배경 크림 아이보리
+              card: '#FFFFFF',
+              soft: '#FAF5EE',
+              border: '#E8DFD8',  // 소프트 브라운 보더
+            },
+            cocoa: {
+              deep: '#4A3B32',    // 본문 텍스트 (가독성 높은 딥 코코아)
+              medium: '#6B5B52',
+              light: '#9E8E84',
+              border: '#D9CCC3',
+            },
+          },
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+            cute: ['Gaegu', 'cursive', 'Pretendard', 'sans-serif'],
+          },
+          boxShadow: {
+            'korila-card': '0 4px 20px -2px rgba(201, 74, 110, 0.08), 0 2px 8px -1px rgba(74, 59, 50, 0.04)',
+            'korila-hover': '0 8px 30px -4px rgba(201, 74, 110, 0.16), 0 4px 12px -2px rgba(74, 59, 50, 0.06)',
+            'korila-btn': '0 4px 15px 0 rgba(201, 74, 110, 0.35)',
+          },
+          borderRadius: {
+            '2xl': '1rem',
+            '3xl': '1.5rem',
+            '4xl': '2rem',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js & Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      background-color: #FDFBF7;
+      color: #4A3B32;
+      font-family: 'Pretendard', sans-serif;
+    }
+    .font-cute-title {
+      font-family: 'Gaegu', cursive;
+    }
+    /* 커스텀 스크롤바 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FDFBF7;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #F4ACB7;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #C94A6E;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-cream-ivory text-cocoa-deep antialiased selection:bg-milk-light selection:text-strawberry-rose">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-cream-border shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- 로고 및 타이틀 -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="scrollToTop()">
+          <div class="relative w-12 h-12 rounded-full bg-gradient-to-br from-milk-light via-milk-pink to-strawberry-rose p-0.5 shadow-md flex items-center justify-center">
+            <div class="w-full h-full bg-white rounded-full flex items-center justify-center text-2xl shadow-inner">
+              🍓
+            </div>
+            <span class="absolute -top-1 -right-1 flex h-4 w-4">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-strawberry-rose opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-4 w-4 bg-strawberry-rose text-[9px] text-white font-bold items-center justify-center">🎀</span>
+            </span>
+          </div>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-cocoa-deep font-cute-title text-2xl sm:text-3xl leading-none">
+                🍓 코리락쿠마 스마트 가계부 🎀
+              </h1>
+            </div>
+            <p class="text-xs text-cocoa-medium hidden sm:block font-medium">
+              딸기 밀크처럼 달콤하고 깔끔한 스마트 자산관리
+            </p>
+          </div>
+        </div>
+
+        <!-- 중앙/우측 컨트롤러 -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <!-- 연월 선택 드롭다운 -->
+          <div class="flex items-center bg-cream-soft border border-cream-border rounded-2xl px-2 sm:px-3 py-1.5 shadow-inner">
+            <span class="text-xs sm:text-sm mr-1.5 font-bold text-strawberry-rose">📅</span>
+            <select id="monthSelect" onchange="changeMonth(this.value)" class="bg-transparent text-xs sm:text-sm font-bold text-cocoa-deep focus:outline-none cursor-pointer">
+              <!-- JS로 동적 생성 -->
+            </select>
+          </div>
+
+          <!-- 자산 현황 버튼 -->
+          <button onclick="openAssetModal()" class="flex items-center space-x-1 px-3 py-2 bg-cream-soft hover:bg-milk-light border border-cream-border rounded-2xl text-xs sm:text-sm font-bold text-cocoa-deep transition-all">
+            <span>🏦</span>
+            <span class="hidden sm:inline">자산 현황</span>
+          </button>
+
+          <!-- ➕ 내역 추가 버튼 -->
+          <button onclick="openTxModal()" class="flex items-center space-x-1 sm:space-x-1.5 px-3.5 sm:px-4 py-2 bg-gradient-to-r from-strawberry-rose to-milk-pink hover:from-strawberry-dark hover:to-strawberry-rose text-white rounded-2xl shadow-korila-btn text-xs sm:text-sm font-bold transition-all transform active:scale-95">
+            <span class="text-base">➕</span>
+            <span>내역 추가</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+    
+    <!-- 1. KPI 카드 섹션 -->
+    <section>
+      <div class="flex items-center justify-between mb-3.5">
+        <h2 class="text-lg sm:text-xl font-bold text-cocoa-deep flex items-center space-x-2">
+          <span>✨</span>
+          <span><span id="kpiMonthLabel" class="text-strawberry-rose">당월</span> 재정 요약</span>
+        </h2>
+        <span class="text-xs text-cocoa-light font-medium">실시간 집계 완료</span>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <!-- 1) 당월 총 수입 -->
+        <div class="bg-white p-4 sm:p-5 rounded-3xl border border-cream-border shadow-korila-card relative overflow-hidden group hover:shadow-korila-hover transition-all">
+          <div class="absolute -right-3 -bottom-3 text-5xl opacity-10 pointer-events-none group-hover:scale-110 transition-transform">💵</div>
+          <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cocoa-medium mb-1">
+            <span>당월 총 수입</span>
+            <span class="w-6 h-6 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-xs">🍓</span>
+          </div>
+          <div id="kpiIncome" class="text-lg sm:text-2xl font-extrabold text-green-600 tabular-nums">0원</div>
+          <p class="text-[11px] text-cocoa-light mt-1">급여 / 상여 / 금융소득</p>
+        </div>
+
+        <!-- 2) 당월 소비지출 -->
+        <div class="bg-white p-4 sm:p-5 rounded-3xl border border-cream-border shadow-korila-card relative overflow-hidden group hover:shadow-korila-hover transition-all">
+          <div class="absolute -right-3 -bottom-3 text-5xl opacity-10 pointer-events-none group-hover:scale-110 transition-transform">🍰</div>
+          <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cocoa-medium mb-1">
+            <span>당월 소비지출</span>
+            <span class="w-6 h-6 rounded-full bg-rose-50 text-strawberry-rose flex items-center justify-center text-xs">💳</span>
+          </div>
+          <div id="kpiExpense" class="text-lg sm:text-2xl font-extrabold text-strawberry-rose tabular-nums">0원</div>
+          <p class="text-[11px] text-cocoa-light mt-1">식비 / 고정 / 쇼핑 등</p>
+        </div>
+
+        <!-- 3) 저축 및 투자액 -->
+        <div class="bg-white p-4 sm:p-5 rounded-3xl border border-cream-border shadow-korila-card relative overflow-hidden group hover:shadow-korila-hover transition-all">
+          <div class="absolute -right-3 -bottom-3 text-5xl opacity-10 pointer-events-none group-hover:scale-110 transition-transform">📈</div>
+          <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cocoa-medium mb-1">
+            <span>저축 · 투자액</span>
+            <span class="w-6 h-6 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xs">🍯</span>
+          </div>
+          <div id="kpiSavingInvest" class="text-lg sm:text-2xl font-extrabold text-amber-600 tabular-nums">0원</div>
+          <p class="text-[11px] text-cocoa-light mt-1">적금 / 청약 / 주식 / ISA</p>
+        </div>
+
+        <!-- 4) 저축률 (%) -->
+        <div class="bg-white p-4 sm:p-5 rounded-3xl border border-cream-border shadow-korila-card relative overflow-hidden group hover:shadow-korila-hover transition-all">
+          <div class="absolute -right-3 -bottom-3 text-5xl opacity-10 pointer-events-none group-hover:scale-110 transition-transform">🎀</div>
+          <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cocoa-medium mb-1">
+            <span>저축률</span>
+            <span class="w-6 h-6 rounded-full bg-milk-light text-strawberry-rose flex items-center justify-center text-xs">🎯</span>
+          </div>
+          <div id="kpiSavingRate" class="text-lg sm:text-2xl font-extrabold text-cocoa-deep tabular-nums">0.0%</div>
+          <p class="text-[11px] text-cocoa-light mt-1">(저축+투자) ÷ 총수입</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 전월 대비 비교표 (MoM) & 코리락쿠마 응원 배너 -->
+    <section class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+            <span>📊</span>
+            <span>전월 대비 실적 비교 (MoM)</span>
+          </h3>
+          <p class="text-xs text-cocoa-light mt-0.5">지난달과 비교한 수입, 소비, 저축 증감 분석표</p>
+        </div>
+        <div id="momPraiseBadge" class="inline-flex items-center px-3 py-1 rounded-full bg-milk-light text-strawberry-rose text-xs font-bold border border-milk-pink self-start sm:self-auto">
+          🍓 코리락쿠마와 함께 스마트한 저축 습관을 만들어요!
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="border-b border-cream-border text-cocoa-medium bg-cream-soft/60">
+              <th class="py-2.5 px-3 font-semibold rounded-l-xl">구분</th>
+              <th class="py-2.5 px-3 font-semibold text-right" id="thPrevMonth">전월</th>
+              <th class="py-2.5 px-3 font-semibold text-right" id="thCurrMonth">당월</th>
+              <th class="py-2.5 px-3 font-semibold text-right">증감액</th>
+              <th class="py-2.5 px-3 font-semibold text-right rounded-r-xl">증감률</th>
+            </tr>
+          </thead>
+          <tbody id="momTableBody" class="divide-y divide-cream-border font-medium">
+            <!-- JS 렌더링 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. 카드별 실적 현황판 & Chart.js 막대 차트 -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- 좌측: 카드별 실적 프로그레스 카드 (7칸) -->
+      <div class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+              <span>💳</span>
+              <span>카드별 당월 실적 현황판</span>
+            </h3>
+            <p class="text-xs text-cocoa-light">목표 금액 달성 시 혜택 및 실적 완료 체크</p>
+          </div>
+          <span class="text-xs font-bold text-strawberry-rose bg-milk-light px-2.5 py-1 rounded-full">당월 기준</span>
+        </div>
+
+        <div id="cardPerformanceList" class="space-y-3.5">
+          <!-- JS 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 우측: Chart.js 카드별 사용액 막대 차트 (5칸) -->
+      <div class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card flex flex-col justify-between">
+        <div class="mb-2">
+          <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+            <span>📈</span>
+            <span>카드별 사용액 비교</span>
+          </h3>
+          <p class="text-xs text-cocoa-light">당월 결제수단별 지출 분포 (Chart.js)</p>
+        </div>
+        <div class="relative w-full h-64 sm:h-72 flex items-center justify-center">
+          <canvas id="cardBarChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 카테고리별 지출 분석 (도넛 차트 & 대분류 표) -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- 도넛 차트 (5칸) -->
+      <div class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card flex flex-col justify-between">
+        <div class="mb-2">
+          <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+            <span>🍩</span>
+            <span>카테고리별 지출 비중</span>
+          </h3>
+          <p class="text-xs text-cocoa-light">어디에 가장 많이 소비했을까요?</p>
+        </div>
+        <div class="relative w-full h-64 sm:h-72 flex items-center justify-center">
+          <canvas id="categoryDonutChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 대분류별 지출액 및 비중 테이블 (7칸) -->
+      <div class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+              <span>🍽️</span>
+              <span>지출 대분류 랭킹</span>
+            </h3>
+            <p class="text-xs text-cocoa-light">소비 항목별 금액 및 점유율</p>
+          </div>
+          <span id="totalExpenseBadge" class="text-xs font-bold text-strawberry-rose bg-rose-50 px-2.5 py-1 rounded-full">총 0원</span>
+        </div>
+
+        <div class="overflow-x-auto max-h-72 custom-scrollbar">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead class="sticky top-0 bg-white">
+              <tr class="border-b border-cream-border text-cocoa-medium">
+                <th class="py-2 px-3 font-semibold">대분류</th>
+                <th class="py-2 px-3 font-semibold text-right">지출액</th>
+                <th class="py-2 px-3 font-semibold text-right">비중</th>
+                <th class="py-2 px-3 font-semibold">비중 그래프</th>
+              </tr>
+            </thead>
+            <tbody id="categoryTableBody" class="divide-y divide-cream-border font-medium">
+              <!-- JS 렌더링 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 최근 12개월 수입/지출/저축 추이 (부드러운 곡선 꺾은선 차트) -->
+    <section class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+            <span>📅</span>
+            <span>최근 12개월 재정 흐름 추이</span>
+          </h3>
+          <p class="text-xs text-cocoa-light">월별 수입, 소비지출, 저축·투자 밸런스 꺾은선 그래프</p>
+        </div>
+        <div class="flex items-center space-x-3 text-xs font-semibold">
+          <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> <span>수입</span></span>
+          <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-strawberry-rose inline-block"></span> <span>지출</span></span>
+          <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> <span>저축·투자</span></span>
+        </div>
+      </div>
+
+      <div class="relative w-full h-72 sm:h-80">
+        <canvas id="trendLineChart"></canvas>
+      </div>
+    </section>
+
+    <!-- 6. 거래내역 관리 테이블 -->
+    <section class="bg-white p-5 sm:p-6 rounded-3xl border border-cream-border shadow-korila-card">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-cocoa-deep flex items-center space-x-2">
+            <span>📝</span>
+            <span>거래내역 목록</span>
+          </h3>
+          <p class="text-xs text-cocoa-light">최신순 정렬 및 개별 삭제 관리</p>
+        </div>
+
+        <!-- 필터 & 검색바 -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- 구분 필터 -->
+          <select id="filterType" onchange="applyTxFilters()" class="bg-cream-soft border border-cream-border text-xs font-semibold text-cocoa-deep rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-strawberry-rose">
+            <option value="ALL">전체 구분</option>
+            <option value="지출">지출만</option>
+            <option value="수입">수입만</option>
+            <option value="저축">저축만</option>
+            <option value="투자">투자만</option>
+          </select>
+
+          <!-- 결제수단 필터 -->
+          <select id="filterPayment" onchange="applyTxFilters()" class="bg-cream-soft border border-cream-border text-xs font-semibold text-cocoa-deep rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-strawberry-rose">
+            <option value="ALL">전체 결제수단</option>
+            <!-- JS 동적 로드 -->
+          </select>
+
+          <!-- 텍스트 검색 -->
+          <input type="text" id="filterKeyword" oninput="applyTxFilters()" placeholder="적요, 메모 검색..." class="bg-cream-soft border border-cream-border text-xs text-cocoa-deep rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-strawberry-rose placeholder:text-cocoa-light w-36 sm:w-44">
+        </div>
+      </div>
+
+      <!-- 거래 테이블 -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="border-b border-cream-border text-cocoa-medium bg-cream-soft/60">
+              <th class="py-3 px-3 font-semibold rounded-l-xl">일자</th>
+              <th class="py-3 px-3 font-semibold">구분</th>
+              <th class="py-3 px-3 font-semibold">분류</th>
+              <th class="py-3 px-3 font-semibold">결제수단 / 계좌</th>
+              <th class="py-3 px-3 font-semibold">적요 / N빵 메모</th>
+              <th class="py-3 px-3 font-semibold text-right">금액</th>
+              <th class="py-3 px-3 font-semibold text-center rounded-r-xl">관리</th>
+            </tr>
+          </thead>
+          <tbody id="transactionTableBody" class="divide-y divide-cream-border font-medium">
+            <!-- JS 렌더링 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 페이지네이션 / 건수 표시 -->
+      <div class="mt-4 flex items-center justify-between text-xs text-cocoa-light pt-2 border-t border-cream-border">
+        <span id="txCountBadge">총 0건의 내역</span>
+        <button onclick="resetAllDataConfirm()" class="text-cocoa-light hover:text-strawberry-rose transition-colors underline text-[11px]">
+          초기 샘플 데이터로 복구
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="mt-12 py-8 bg-white border-t border-cream-border text-center text-xs text-cocoa-light">
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+      <p class="font-cute-title text-base text-strawberry-rose">🍓 코리락쿠마 딸기 밀크 스마트 가계부 🎀</p>
+      <p>모든 데이터는 브라우저 내(localStorage)에 안전하게 저장되며 외부 서버로 전송되지 않습니다.</p>
+      <p class="text-[11px] text-cocoa-border">Designed with Cream Ivory, Strawberry Rose & Cocoa Brown Palette</p>
+    </div>
+  </footer>
+
+  <!-- ==================== 입력 모달 (유저폼) ==================== -->
+  <div id="txModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cocoa-deep/50 backdrop-blur-xs hidden transition-opacity">
+    <div class="bg-white rounded-3xl border border-cream-border shadow-2xl w-full max-w-lg overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- 모달 헤더 -->
+      <div class="bg-gradient-to-r from-milk-subtle via-cream-ivory to-milk-light px-6 py-4 border-b border-cream-border flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">🍓</span>
+          <h3 class="text-lg font-bold text-cocoa-deep">새 거래 내역 등록</h3>
+        </div>
+        <button onclick="closeTxModal()" class="w-8 h-8 rounded-full bg-white/80 hover:bg-white text-cocoa-medium flex items-center justify-center font-bold text-sm shadow-xs transition-colors">
+          ✕
+        </button>
+      </div>
+
+      <!-- 모달 폼 -->
+      <form id="txForm" onsubmit="handleTxSubmit(event)" class="p-6 space-y-4 text-xs sm:text-sm">
+        
+        <!-- 1) 일자 & 구분 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">거래일자 📅</label>
+            <input type="date" id="inputDate" required class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose">
+          </div>
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">구분 🔖</label>
+            <select id="inputType" onchange="onTypeChanged(this.value)" required class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose cursor-pointer">
+              <option value="지출">💸 지출</option>
+              <option value="수입">💰 수입</option>
+              <option value="저축">🐷 저축</option>
+              <option value="투자">📈 투자</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 2) 대분류 & 소분류 (2단 연동 체인 드롭다운) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">대분류 📂</label>
+            <select id="inputMajorCategory" onchange="onMajorCategoryChanged(this.value)" required class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose cursor-pointer">
+              <!-- JS 동적 생성 -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">소분류 (이모지 포함) 🏷️</label>
+            <select id="inputSubCategory" required class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose cursor-pointer">
+              <!-- JS 동적 생성 -->
+            </select>
+          </div>
+        </div>
+
+        <!-- 3) 결제수단 & 연결계좌 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">결제수단 💳</label>
+            <select id="inputPaymentMethod" required class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose cursor-pointer">
+              <!-- JS 동적 생성 -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-cocoa-deep mb-1">연결계좌 🏦</label>
+            <select id="inputAccount" class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-semibold focus:outline-none focus:ring-2 focus:ring-strawberry-rose cursor-pointer">
+              <!-- JS 동적 생성 -->
+            </select>
+          </div>
+        </div>
+
+        <!-- 4) 금액 -->
+        <div>
+          <label class="block font-bold text-cocoa-deep mb-1">금액 (원) 💵</label>
+          <div class="relative">
+            <input type="number" id="inputAmount" required min="1" step="1" placeholder="예: 35000" class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2.5 text-base font-extrabold text-cocoa-deep focus:outline-none focus:ring-2 focus:ring-strawberry-rose tabular-nums placeholder:font-normal placeholder:text-sm">
+            <span class="absolute right-3.5 top-2.5 font-bold text-cocoa-medium text-sm">원</span>
+          </div>
+        </div>
+
+        <!-- 5) 적요(내용) -->
+        <div>
+          <label class="block font-bold text-cocoa-deep mb-1">적요 (상세 내용) 📝</label>
+          <input type="text" id="inputDescription" required placeholder="예: 딸기 타르트 & 바닐라라떼 디저트" class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-medium focus:outline-none focus:ring-2 focus:ring-strawberry-rose">
+        </div>
+
+        <!-- 6) N빵 / 정산 메모 -->
+        <div>
+          <label class="block font-bold text-cocoa-deep mb-1">N빵 / 정산 메모 (선택) 👥</label>
+          <input type="text" id="inputSplitMemo" placeholder="예: 친구 3명 N빵 (인당 12,000원 카카오페이 정산)" class="w-full bg-cream-soft border border-cream-border rounded-xl px-3 py-2 text-cocoa-deep font-medium focus:outline-none focus:ring-2 focus:ring-strawberry-rose placeholder:text-cocoa-light">
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div class="pt-3 flex items-center space-x-2">
+          <button type="button" onclick="closeTxModal()" class="w-1/3 py-2.5 rounded-xl border border-cream-border bg-cream-soft text-cocoa-medium font-bold hover:bg-cream-border transition-colors">
+            취소
+          </button>
+          <button type="submit" class="w-2/3 py-2.5 rounded-xl bg-gradient-to-r from-strawberry-rose to-milk-pink hover:from-strawberry-dark hover:to-strawberry-rose text-white font-bold shadow-korila-btn transition-all transform active:scale-98 flex items-center justify-center space-x-1.5">
+            <span>🍓</span>
+            <span>가계부에 쏙 등록하기</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== 자산 현황 탭 / 모달 ==================== -->
+  <div id="assetModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cocoa-deep/50 backdrop-blur-xs hidden transition-opacity">
+    <div class="bg-white rounded-3xl border border-cream-border shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- 모달 헤더 -->
+      <div class="bg-gradient-to-r from-milk-subtle via-cream-ivory to-milk-light px-6 py-4 border-b border-cream-border flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">🏦</span>
+          <div>
+            <h3 class="text-lg font-bold text-cocoa-deep">보유 계좌 및 자산 현황 요약</h3>
+            <p class="text-xs text-cocoa-medium">입출금, 파킹통장, 적금, 증권계좌 잔액 관리</p>
+          </div>
+        </div>
+        <button onclick="closeAssetModal()" class="w-8 h-8 rounded-full bg-white/80 hover:bg-white text-cocoa-medium flex items-center justify-center font-bold text-sm shadow-xs transition-colors">
+          ✕
+        </button>
+      </div>
+
+      <!-- 모달 바디 (스크롤 가능) -->
+      <div class="p-6 overflow-y-auto space-y-6 text-xs sm:text-sm custom-scrollbar">
+        
+        <!-- 총 자산 KPI 요약 -->
+        <div class="bg-gradient-to-br from-cream-soft to-milk-subtle p-5 rounded-3xl border border-cream-border">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-cocoa-medium text-xs sm:text-sm">현재 총 자산 합계</span>
+            <span class="text-xs font-bold text-strawberry-rose bg-white px-2.5 py-0.5 rounded-full border border-milk-pink">실시간 잔액 합산</span>
+          </div>
+          <div id="modalTotalAsset" class="text-2xl sm:text-3xl font-extrabold text-strawberry-rose tabular-nums mt-1">0원</div>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 pt-3 border-t border-cream-border text-center">
+            <div class="bg-white/80 p-2 rounded-xl">
+              <span class="text-[11px] text-cocoa-light block">입출금</span>
+              <span id="subTotalDeposit" class="font-bold text-cocoa-deep tabular-nums">0원</span>
+            </div>
+            <div class="bg-white/80 p-2 rounded-xl">
+              <span class="text-[11px] text-cocoa-light block">파킹/비상금</span>
+              <span id="subTotalParking" class="font-bold text-cocoa-deep tabular-nums">0원</span>
+            </div>
+            <div class="bg-white/80 p-2 rounded-xl">
+              <span class="text-[11px] text-cocoa-light block">적금/청약</span>
+              <span id="subTotalSaving" class="font-bold text-cocoa-deep tabular-nums">0원</span>
+            </div>
+            <div class="bg-white/80 p-2 rounded-xl">
+              <span class="text-[11px] text-cocoa-light block">투자/증권</span>
+              <span id="subTotalInvest" class="font-bold text-cocoa-deep tabular-nums">0원</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 계좌별 잔액 리스트 및 수정 인풋 -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-cocoa-deep text-sm flex items-center space-x-1.5">
+              <span>📋</span>
+              <span>계좌 목록 & 잔액 직접 수정</span>
+            </h4>
+            <span class="text-[11px] text-cocoa-light">수정 후 [잔액 저장] 버튼을 누르세요</span>
+          </div>
+
+          <div id="assetAccountList" class="space-y-2.5">
+            <!-- JS 렌더링 -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 모달 푸터 -->
+      <div class="bg-cream-soft px-6 py-3.5 border-t border-cream-border flex items-center justify-between shrink-0">
+        <span class="text-[11px] text-cocoa-light">모든 계좌 잔액은 브라우저에 안전히 보관됩니다.</span>
+        <button onclick="saveAssetBalances()" class="px-5 py-2 rounded-xl bg-strawberry-rose hover:bg-strawberry-dark text-white font-bold text-xs sm:text-sm shadow-md transition-all">
+          💾 잔액 변경 저장하기
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    /* ==========================================================================
+       1. 마스터 데이터 및 카테고리 정의
+       ========================================================================== */
+    const MASTER_CATEGORIES = {
+      '수입': {
+        '근로소득': [
+          { name: '기본급 🍓', icon: '🍓' }
+        ],
+        '비정기소득': [
+          { name: '상여금(명절/휴가) 🎁', icon: '🎁' }
+        ],
+        '금융소득': [
+          { name: '예적금 이자 🍯', icon: '🍯' },
+          { name: '배당금 및 투자수익 📈', icon: '📈' }
+        ],
+        '기타소득': [
+          { name: '중고거래/환급금/기타 ✨', icon: '✨' }
+        ]
+      },
+      '저축': {
+        '시드머니': [
+          { name: '하나은행 적금 🏠 (월 50만)', icon: '🏠' }
+        ],
+        '반려동물': [
+          { name: 'KB국민 반려동물 적금 🐾 (월 30만)', icon: '🐾' }
+        ],
+        '주택마련': [
+          { name: '주택청약종합저축 🗝️ (월 10만)', icon: '🗝️' }
+        ],
+        '비상금': [
+          { name: '파킹통장 적립 🛡️', icon: '🛡️' }
+        ]
+      },
+      '투자': {
+        '주식/ETF': [
+          { name: '키움증권 ISA (ETF) 📊', icon: '📊' },
+          { name: '키움증권 일반 주식 📈', icon: '📈' },
+          { name: '토스증권 주식 🍓', icon: '🍓' }
+        ]
+      },
+      '지출': {
+        '식비/카페': [
+          { name: '식비 (장보기/외식/배달) 🍽️', icon: '🍽️' },
+          { name: '카페/음료/디저트 🍰', icon: '🍰' }
+        ],
+        '차량/교통': [
+          { name: '주유비 ⛽', icon: '⛽' },
+          { name: '하이패스/통행료 🛣️', icon: '🛣️' },
+          { name: '차량유지비(세차/정비/주차) 🚗', icon: '🚗' }
+        ],
+        '반려동물': [
+          { name: '반려용품/사료/간식 🐾', icon: '🐾' },
+          { name: '동물병원/약값 🏥', icon: '🏥' }
+        ],
+        '고정지출': [
+          { name: '통신비 (휴대폰) 📱', icon: '📱' },
+          { name: 'DB손해보험 자동차보험 🛡️', icon: '🛡️' },
+          { name: 'DB손해보험 운전자보험 🛡️', icon: '🛡️' },
+          { name: '한화손해보험 📄', icon: '📄' },
+          { name: '메트라이프생명 📄', icon: '📄' }
+        ],
+        '구독/멤버십': [
+          { name: 'OTT/애플뮤직/유튜브 🎵', icon: '🎵' },
+          { name: '네이버플러스 멤버십 📦', icon: '📦' }
+        ],
+        '생활/쇼핑': [
+          { name: '쇼핑/생필품/의류/미용 🛍️', icon: '🛍️' }
+        ],
+        '의료/건강': [
+          { name: '본인 병원비/약국 💊', icon: '💊' }
+        ],
+        '문화/여가': [
+          { name: '야구 직관/스포츠 ⚾', icon: '⚾' },
+          { name: '여행/나들이 ✈️', icon: '✈️' }
+        ],
+        '모임/후원': [
+          { name: '여행 모임통장 회비 👛 (월 1만)', icon: '👛' },
+          { name: '정기 기부금 💖', icon: '💖' }
+        ],
+        '부채/할부': [
+          { name: '신용카드 할부금 💳', icon: '💳' }
+        ]
+      }
+    };
+
+    // 결제수단 및 목표 실적
+    const PAYMENT_METHODS = [
+      { id: 'hyundai_zero', name: '현대카드 ZERO Edition2', type: '신용카드', target: 500000, color: '#C94A6E' },
+      { id: 'dongbaek', name: '동백전', type: '체크카드', target: 300000, color: '#F4ACB7' },
+      { id: 'kb_youth', name: 'KB국민 유스클럽 체크카드', type: '체크카드', target: 200000, color: '#F5CB5C' },
+      { id: 'hana_daldal', name: '하나 달달하나 체크카드', type: '체크카드', target: 200000, color: '#008485' },
+      { id: 'hana_travel', name: '하나 트래블로그 체크카드', type: '체크카드', target: 0, color: '#72D1B8' },
+      { id: 'kakao_card', name: '카카오뱅크 체크카드', type: '체크카드', target: 300000, color: '#FFE600' },
+      { id: 'transfer_cash', name: '계좌이체 / 현금', type: '현금/이체', target: 0, color: '#9E8E84' },
+      { id: 'hipass', name: '하이패스 충전카드', type: '교통카드', target: 0, color: '#4A3B32' }
+    ];
+
+    // 보유 계좌 및 자산 분류
+    const INITIAL_ASSETS = [
+      { id: 'acc_1', group: '입출금', name: '하나은행 입출금', balance: 1850000 },
+      { id: 'acc_2', group: '입출금', name: 'KB국민은행 입출금', balance: 720000 },
+      { id: 'acc_3', group: '입출금', name: '카카오뱅크 입출금', balance: 940000 },
+      { id: 'acc_4', group: '파킹/비상금', name: '카카오뱅크 파킹통장 (세이프박스)', balance: 4500000 },
+      { id: 'acc_5', group: '파킹/비상금', name: '네이버페이(미래에셋) 파킹/CMA', balance: 3200000 },
+      { id: 'acc_6', group: '적금/청약', name: '하나은행 적금 (내집마련)', balance: 6000000 },
+      { id: 'acc_7', group: '적금/청약', name: 'KB국민 반려동물 적금', balance: 2400000 },
+      { id: 'acc_8', group: '적금/청약', name: '주택청약종합저축', balance: 3600000 },
+      { id: 'acc_9', group: '투자/증권', name: '키움증권 ISA 계좌', balance: 5200000 },
+      { id: 'acc_10', group: '투자/증권', name: '키움증권 일반 증권계좌', balance: 4100000 },
+      { id: 'acc_11', group: '투자/증권', name: '토스증권 계좌', balance: 2850000 }
+    ];
+
+    /* ==========================================================================
+       2. 초기 더미 데이터 생성기 (최근 12개월 현실적 데이터)
+       ========================================================================== */
+    function generateSampleTransactions() {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1; // 1 ~ 12
+      const txs = [];
+
+      // 12개월간 반복 (과거 11개월 ~ 당월)
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(currentYear, currentMonth - 1 - i, 1);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const ym = `${y}-${m}`;
+
+        // 수입: 기본급 (매달 25일)
+        txs.push({
+          id: `tx-sal-${ym}`,
+          date: `${ym}-25`,
+          type: '수입',
+          majorCategory: '근로소득',
+          subCategory: '기본급 🍓',
+          paymentMethod: '계좌이체 / 현금',
+          account: '하나은행 입출금',
+          amount: 3200000 + (i === 4 ? 600000 : 0), // 보너스 달
+          description: i === 4 ? '기본급 + 명절 귀향비 상여 🎁' : '본업 정기 기본급',
+          splitMemo: ''
+        });
+
+        // 수입: 이자 (매달 10일)
+        txs.push({
+          id: `tx-int-${ym}`,
+          date: `${ym}-10`,
+          type: '수입',
+          majorCategory: '금융소득',
+          subCategory: '예적금 이자 🍯',
+          paymentMethod: '계좌이체 / 현금',
+          account: '카카오뱅크 파킹통장 (세이프박스)',
+          amount: 35000 + (i % 4) * 8000,
+          description: '파킹통장 세이프박스 결산 이자',
+          splitMemo: ''
+        });
+
+        // 저축: 하나은행 적금 (월 50만)
+        txs.push({
+          id: `tx-sav1-${ym}`,
+          date: `${ym}-26`,
+          type: '저축',
+          majorCategory: '시드머니',
+          subCategory: '하나은행 적금 🏠 (월 50만)',
+          paymentMethod: '계좌이체 / 현금',
+          account: '하나은행 적금 (내집마련)',
+          amount: 500000,
+          description: '하나은행 시드머니 적금 자동이체',
+          splitMemo: ''
+        });
+
+        // 저축: KB 반려동물 적금 (월 30만)
+        txs.push({
+          id: `tx-sav2-${ym}`,
+          date: `${ym}-26`,
+          type: '저축',
+          majorCategory: '반려동물',
+          subCategory: 'KB국민 반려동물 적금 🐾 (월 30만)',
+          paymentMethod: '계좌이체 / 현금',
+          account: 'KB국민 반려동물 적금',
+          amount: 300000,
+          description: '반려동물 행복 적금 자동이체 🐾',
+          splitMemo: ''
+        });
+
+        // 저축: 주택청약 (월 10만)
+        txs.push({
+          id: `tx-sav3-${ym}`,
+          date: `${ym}-26`,
+          type: '저축',
+          majorCategory: '주택마련',
+          subCategory: '주택청약종합저축 🗝️ (월 10만)',
+          paymentMethod: '계좌이체 / 현금',
+          account: '주택청약종합저축',
+          amount: 100000,
+          description: '주택청약 1순위 유지 납입',
+          splitMemo: ''
+        });
+
+        // 투자: 키움 ISA ETF (월 30만)
+        txs.push({
+          id: `tx-inv1-${ym}`,
+          date: `${ym}-27`,
+          type: '투자',
+          majorCategory: '주식/ETF',
+          subCategory: '키움증권 ISA (ETF) 📊',
+          paymentMethod: '계좌이체 / 현금',
+          account: '키움증권 ISA 계좌',
+          amount: 300000,
+          description: '미국 배당 다우존스 ETF 적립식 매수',
+          splitMemo: ''
+        });
+
+        // 지출: 고정 통신비 (월 15일)
+        txs.push({
+          id: `tx-fix-tel-${ym}`,
+          date: `${ym}-15`,
+          type: '지출',
+          majorCategory: '고정지출',
+          subCategory: '통신비 (휴대폰) 📱',
+          paymentMethod: '현대카드 ZERO Edition2',
+          account: '하나은행 입출금',
+          amount: 54000,
+          description: '스마트폰 요금 자동납부',
+          splitMemo: ''
+        });
+
+        // 지출: 보험료 (월 20일)
+        txs.push({
+          id: `tx-fix-ins-${ym}`,
+          date: `${ym}-20`,
+          type: '지출',
+          majorCategory: '고정지출',
+          subCategory: 'DB손해보험 운전자보험 🛡️',
+          paymentMethod: '현대카드 ZERO Edition2',
+          account: '하나은행 입출금',
+          amount: 28000,
+          description: '운전자보험 정기 납입',
+          splitMemo: ''
+        });
+
+        // 지출: OTT 구독
+        txs.push({
+          id: `tx-fix-ott-${ym}`,
+          date: `${ym}-05`,
+          type: '지출',
+          majorCategory: '구독/멤버십',
+          subCategory: 'OTT/애플뮤직/유튜브 🎵',
+          paymentMethod: '현대카드 ZERO Edition2',
+          account: '하나은행 입출금',
+          amount: 17000,
+          description: '넷플릭스 프리미엄 파티 요금',
+          splitMemo: '4명 N빵 (인당 4,250원 수금 완료)'
+        });
+      }
+
+      // 당월 및 전월의 상세 지출 내역 (카드 실적 달성 & 다양한 라이프스타일)
+      const targetMonths = [
+        { ym: `${currentYear}-${String(currentMonth).padStart(2, '0')}`, ratio: 1.0 },
+        { 
+          ym: (() => {
+            const prev = new Date(currentYear, currentMonth - 2, 1);
+            return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
+          })(),
+          ratio: 0.95
+        }
+      ];
+
+      targetMonths.forEach(({ ym }) => {
+        // 현대카드 ZERO Edition2 (목표 50만원 채우기용)
+        txs.push({
+          id: `tx-hz1-${ym}`,
+          date: `${ym}-04`,
+          type: '지출',
+          majorCategory: '생활/쇼핑',
+          subCategory: '쇼핑/생필품/의류/미용 🛍️',
+          paymentMethod: '현대카드 ZERO Edition2',
+          account: '하나은행 입출금',
+          amount: 185000,
+          description: '가을/겨울 포근한 가디건 & 슬랙스 쇼핑',
+          splitMemo: ''
+        });
+
+        txs.push({
+          id: `tx-hz2-${ym}`,
+          date: `${ym}-11`,
+          type: '지출',
+          majorCategory: '식비/카페',
+          subCategory: '식비 (장보기/외식/배달) 🍽️',
+          paymentMethod: '현대카드 ZERO Edition2',
+          account: '하나은행 입출금',
+          amount: 142000,
+          description: '친구들과 이탈리안 레스토랑 파스타 & 와인',
+          splitMemo: '3명 N빵 (인당 47,300원 즉시 수금 완료)'
+        });
+
+        txs.push({
+          id: `tx-hz3-${ym}`,
+          date: `${ym}-18`,
+          type: '지출',
+          majorCategory: '문화/여가',
+          subCategory: '야구 직관/스포츠 ⚾',
+          paymentMethod: '현대카드 ZERO Edition2',
+          account: '하나은행 입출금',
+          amount: 76000,
+          description: '사직 야구장 직관 테이블석 예매 & 치킨 ⚾',
+          splitMemo: '단짝이랑 반띵 (38,000원 송금받음)'
+        });
+
+        // 동백전 (목표 30만원 채우기용)
+        txs.push({
+          id: `tx-db1-${ym}`,
+          date: `${ym}-02`,
+          type: '지출',
+          majorCategory: '식비/카페',
+          subCategory: '식비 (장보기/외식/배달) 🍽️',
+          paymentMethod: '동백전',
+          account: 'KB국민은행 입출금',
+          amount: 98000,
+          description: '동네 마트 장보기 (딸기🍓, 우유, 그릭요거트, 소고기)',
+          splitMemo: ''
+        });
+
+        txs.push({
+          id: `tx-db2-${ym}`,
+          date: `${ym}-09`,
+          type: '지출',
+          majorCategory: '식비/카페',
+          subCategory: '카페/음료/디저트 🍰',
+          paymentMethod: '동백전',
+          account: 'KB국민은행 입출금',
+          amount: 28500,
+          description: '딸기 롤케이크 & 바닐라빈 라떼 디저트 타임 🍓',
+          splitMemo: ''
+        });
+
+        txs.push({
+          id: `tx-db3-${ym}`,
+          date: `${ym}-16`,
+          type: '지출',
+          majorCategory: '반려동물',
+          subCategory: '반려용품/사료/간식 🐾',
+          paymentMethod: '동백전',
+          account: 'KB국민은행 입출금',
+          amount: 115000,
+          description: '반려견 프리미엄 알러지 사료 & 덴탈껌 구매 🐾',
+          splitMemo: ''
+        });
+
+        txs.push({
+          id: `tx-db4-${ym}`,
+          date: `${ym}-21`,
+          type: '지출',
+          majorCategory: '의료/건강',
+          subCategory: '본인 병원비/약국 💊',
+          paymentMethod: '동백전',
+          account: 'KB국민은행 입출금',
+          amount: 35000,
+          description: '이비인후과 비염 진료 및 영양제 처방',
+          splitMemo: ''
+        });
+
+        // KB국민 유스클럽 체크카드 (목표 20만원)
+        txs.push({
+          id: `tx-kb1-${ym}`,
+          date: `${ym}-06`,
+          type: '지출',
+          majorCategory: '차량/교통',
+          subCategory: '주유비 ⛽',
+          paymentMethod: 'KB국민 유스클럽 체크카드',
+          account: 'KB국민은행 입출금',
+          amount: 90000,
+          description: 'GS칼텍스 휘발유 가득 주유 ⛽',
+          splitMemo: ''
+        });
+
+        txs.push({
+          id: `tx-kb2-${ym}`,
+          date: `${ym}-14`,
+          type: '지출',
+          majorCategory: '식비/카페',
+          subCategory: '식비 (장보기/외식/배달) 🍽️',
+          paymentMethod: 'KB국민 유스클럽 체크카드',
+          account: 'KB국민은행 입출금',
+          amount: 36000,
+          description: '배달의민족 로제 떡볶이 & 모듬튀김',
+          splitMemo: '가족들과 18,000원씩 정산'
+        });
+
+        // 하나 달달하나 체크카드 (목표 20만원)
+        txs.push({
+          id: `tx-hd1-${ym}`,
+          date: `${ym}-08`,
+          type: '지출',
+          majorCategory: '식비/카페',
+          subCategory: '카페/음료/디저트 🍰',
+          paymentMethod: '하나 달달하나 체크카드',
+          account: '하나은행 입출금',
+          amount: 45000,
+          description: '스타벅스 딸기 아사이 리프레셔 & 텀블러',
+          splitMemo: ''
+        });
+
+        txs.push({
+          id: `tx-hd2-${ym}`,
+          date: `${ym}-19`,
+          type: '지출',
+          majorCategory: '차량/교통',
+          subCategory: '차량유지비(세차/정비/주차) 🚗',
+          paymentMethod: '하나 달달하나 체크카드',
+          account: '하나은행 입출금',
+          amount: 40000,
+          description: '노터치 프리미엄 손세차 & 왁스코팅',
+          splitMemo: ''
+        });
+
+        // 카카오뱅크 체크카드 (목표 30만원)
+        txs.push({
+          id: `tx-kk1-${ym}`,
+          date: `${ym}-07`,
+          type: '지출',
+          majorCategory: '식비/카페',
+          subCategory: '식비 (장보기/외식/배달) 🍽️',
+          paymentMethod: '카카오뱅크 체크카드',
+          account: '카카오뱅크 입출금',
+          amount: 110000,
+          description: '이마트 트레이더스 대용량 장보기',
+          splitMemo: ''
+        });
+
+        // 모임통장 회비 (모임/후원)
+        txs.push({
+          id: `tx-grp-${ym}`,
+          date: `${ym}-01`,
+          type: '지출',
+          majorCategory: '모임/후원',
+          subCategory: '여행 모임통장 회비 👛 (월 1만)',
+          paymentMethod: '계좌이체 / 현금',
+          account: '카카오뱅크 입출금',
+          amount: 10000,
+          description: '고등학교 친구들 일본여행 모임통장 회비',
+          splitMemo: ''
+        });
+
+        // 하이패스 통행료
+        txs.push({
+          id: `tx-hip-${ym}`,
+          date: `${ym}-13`,
+          type: '지출',
+          majorCategory: '차량/교통',
+          subCategory: '하이패스/통행료 🛣️',
+          paymentMethod: '하이패스 충전카드',
+          account: '하나은행 입출금',
+          amount: 14500,
+          description: '부산-울산 고속도로 하이패스 통행료',
+          splitMemo: ''
+        });
+      });
+
+      return txs.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    /* ==========================================================================
+       3. 상태 관리 (localStorage 연동)
+       ========================================================================== */
+    const STORAGE_KEYS = {
+      TRANSACTIONS: 'korila_smart_ledger_txs_v2',
+      ASSETS: 'korila_smart_ledger_assets_v2',
+      SELECTED_MONTH: 'korila_smart_ledger_month_v2'
+    };
+
+    let g_transactions = [];
+    let g_assets = [];
+    let g_selectedMonth = '';
+
+    // Chart.js 인스턴스들
+    let g_cardBarChart = null;
+    let g_categoryDonutChart = null;
+    let g_trendLineChart = null;
+
+    // 초기화 로드
+    function initApp() {
+      // 1) 트랜잭션 로드
+      const savedTxs = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+      if (savedTxs) {
+        try {
+          g_transactions = JSON.parse(savedTxs);
+        } catch (e) {
+          g_transactions = generateSampleTransactions();
+        }
+      } else {
+        g_transactions = generateSampleTransactions();
+        saveTransactions();
+      }
+
+      // 2) 자산 로드
+      const savedAssets = localStorage.getItem(STORAGE_KEYS.ASSETS);
+      if (savedAssets) {
+        try {
+          g_assets = JSON.parse(savedAssets);
+        } catch (e) {
+          g_assets = JSON.parse(JSON.stringify(INITIAL_ASSETS));
+        }
+      } else {
+        g_assets = JSON.parse(JSON.stringify(INITIAL_ASSETS));
+        saveAssets();
+      }
+
+      // 3) 선택 연월 설정 (기본 당월)
+      const now = new Date();
+      const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const savedMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH);
+      g_selectedMonth = savedMonth || currentYM;
+
+      // 4) UI 셀렉트 및 폼 초기 세팅
+      initMonthDropdown();
+      initFormOptions();
+      initFilterDropdowns();
+
+      // 5) 전체 대시보드 렌더링
+      renderAll();
+    }
+
+    function saveTransactions() {
+      localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(g_transactions));
+    }
+
+    function saveAssets() {
+      localStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify(g_assets));
+    }
+
+    function saveSelectedMonth() {
+      localStorage.setItem(STORAGE_KEYS.SELECTED_MONTH, g_selectedMonth);
+    }
+
+    /* ==========================================================================
+       4. 유틸리티 및 포맷터 함수
+       ========================================================================== */
+    function formatCurrency(num) {
+      if (num === undefined || num === null || isNaN(num)) return '0원';
+      return `${Math.round(Number(num)).toLocaleString('ko-KR')}원`;
+    }
+
+    function formatShortCurrency(num) {
+      const val = Number(num) || 0;
+      if (Math.abs(val) >= 100000000) return `${(val / 100000000).toFixed(1)}억`;
+      if (Math.abs(val) >= 10000) return `${Math.round(val / 10000)}만`;
+      return `${val.toLocaleString('ko-KR')}`;
+    }
+
+    function formatPercent(val, withSign = true) {
+      if (val === undefined || val === null || isNaN(val)) return '0.0%';
+      const sign = withSign && val > 0 ? '+' : '';
+      return `${sign}${val.toFixed(1)}%`;
+    }
+
+    function getOffsetYearMonth(ym, offset) {
+      const [year, month] = ym.split('-').map(Number);
+      const date = new Date(year, month - 1 + offset, 1);
+      const nextY = date.getFullYear();
+      const nextM = String(date.getMonth() + 1).padStart(2, '0');
+      return `${nextY}-${nextM}`;
+    }
+
+    function formatYMString(ym) {
+      const [y, m] = ym.split('-');
+      return `${y}년 ${parseInt(m, 10)}월`;
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ==========================================================================
+       5. 연월 선택기 세팅
+       ========================================================================== */
+    function initMonthDropdown() {
+      const select = document.getElementById('monthSelect');
+      select.innerHTML = '';
+
+      const now = new Date();
+      const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+      // 최근 24개월치 옵션 생성
+      for (let i = 3; i >= -18; i--) {
+        const ym = getOffsetYearMonth(currentYM, i);
+        const opt = document.createElement('option');
+        opt.value = ym;
+        opt.textContent = `${formatYMString(ym)}${ym === currentYM ? ' (당월)' : ''}`;
+        if (ym === g_selectedMonth) opt.selected = true;
+        select.appendChild(opt);
+      }
+    }
+
+    function changeMonth(newYM) {
+      g_selectedMonth = newYM;
+      saveSelectedMonth();
+      renderAll();
+    }
+
+    /* ==========================================================================
+       6. 폼 & 필터 옵션 초기 세팅
+       ========================================================================== */
+    function initFormOptions() {
+      // 오늘 날짜 기본값
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      document.getElementById('inputDate').value = todayStr;
+
+      // 결제수단 옵션 채우기
+      const paySelect = document.getElementById('inputPaymentMethod');
+      paySelect.innerHTML = '';
+      PAYMENT_METHODS.forEach(pm => {
+        const opt = document.createElement('option');
+        opt.value = pm.name;
+        opt.textContent = `${pm.name} (${pm.type})`;
+        paySelect.appendChild(opt);
+      });
+
+      // 연결계좌 옵션 채우기
+      const accSelect = document.getElementById('inputAccount');
+      accSelect.innerHTML = '<option value="">선택 안 함 (선택사항)</option>';
+      g_assets.forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.name;
+        opt.textContent = `[${acc.group}] ${acc.name}`;
+        accSelect.appendChild(opt);
+      });
+
+      // 구분별 카테고리 2단 체인 초기화
+      onTypeChanged('지출');
+    }
+
+    function onTypeChanged(type) {
+      const majorSelect = document.getElementById('inputMajorCategory');
+      majorSelect.innerHTML = '';
+
+      const majorGroups = MASTER_CATEGORIES[type] || {};
+      const majorKeys = Object.keys(majorGroups);
+
+      majorKeys.forEach(major => {
+        const opt = document.createElement('option');
+        opt.value = major;
+        opt.textContent = major;
+        majorSelect.appendChild(opt);
+      });
+
+      // 첫 번째 대분류 기준으로 소분류 업데이트
+      if (majorKeys.length > 0) {
+        onMajorCategoryChanged(majorKeys[0]);
+      } else {
+        document.getElementById('inputSubCategory').innerHTML = '';
+      }
+    }
+
+    function onMajorCategoryChanged(major) {
+      const type = document.getElementById('inputType').value;
+      const subSelect = document.getElementById('inputSubCategory');
+      subSelect.innerHTML = '';
+
+      const subList = (MASTER_CATEGORIES[type] && MASTER_CATEGORIES[type][major]) || [];
+      subList.forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub.name;
+        opt.textContent = sub.name;
+        subSelect.appendChild(opt);
+      });
+    }
+
+    function initFilterDropdowns() {
+      const filterPay = document.getElementById('filterPayment');
+      filterPay.innerHTML = '<option value="ALL">전체 결제수단</option>';
+      PAYMENT_METHODS.forEach(pm => {
+        const opt = document.createElement('option');
+        opt.value = pm.name;
+        opt.textContent = pm.name;
+        filterPay.appendChild(opt);
+      });
+    }
+
+    /* ==========================================================================
+       7. 대시보드 렌더링 총괄
+       ========================================================================== */
+    function renderAll() {
+      document.getElementById('kpiMonthLabel').textContent = formatYMString(g_selectedMonth);
+
+      // 당월 및 전월 필터링 데이터
+      const currTxs = g_transactions.filter(t => t.date.startsWith(g_selectedMonth));
+      const prevYM = getOffsetYearMonth(g_selectedMonth, -1);
+      const prevTxs = g_transactions.filter(t => t.date.startsWith(prevYM));
+
+      // 1) KPI 계산 및 출력
+      renderKPIs(currTxs);
+
+      // 2) 전월 대비(MoM) 비교표 출력
+      renderMoM(currTxs, prevTxs, prevYM);
+
+      // 3) 카드별 실적 현황판 & Chart.js 막대 차트
+      renderCardPerformance(currTxs);
+
+      // 4) 카테고리별 지출 분석 (도넛 & 테이블)
+      renderCategoryAnalysis(currTxs);
+
+      // 5) 최근 12개월 추이 꺾은선 차트
+      renderTrendChart();
+
+      // 6) 거래내역 테이블
+      applyTxFilters();
+    }
+
+    /* --------------------------------------------------------------------------
+       7-1. KPI 카드 렌더링
+       -------------------------------------------------------------------------- */
+    function renderKPIs(currTxs) {
+      let income = 0;
+      let expense = 0;
+      let savingInvest = 0;
+
+      currTxs.forEach(t => {
+        const amt = Number(t.amount) || 0;
+        if (t.type === '수입') income += amt;
+        else if (t.type === '지출') expense += amt;
+        else if (t.type === '저축' || t.type === '투자') savingInvest += amt;
+      });
+
+      const savingRate = income > 0 ? (savingInvest / income) * 100 : 0;
+
+      document.getElementById('kpiIncome').textContent = formatCurrency(income);
+      document.getElementById('kpiExpense').textContent = formatCurrency(expense);
+      document.getElementById('kpiSavingInvest').textContent = formatCurrency(savingInvest);
+      document.getElementById('kpiSavingRate').textContent = `${savingRate.toFixed(1)}%`;
+    }
+
+    /* --------------------------------------------------------------------------
+       7-2. MoM 전월 비교표
+       -------------------------------------------------------------------------- */
+    function renderMoM(currTxs, prevTxs, prevYM) {
+      document.getElementById('thPrevMonth').textContent = formatYMString(prevYM);
+      document.getElementById('thCurrMonth').textContent = formatYMString(g_selectedMonth);
+
+      const calcSums = (txList) => {
+        let income = 0, expense = 0, saving = 0;
+        txList.forEach(t => {
+          const amt = Number(t.amount) || 0;
+          if (t.type === '수입') income += amt;
+          else if (t.type === '지출') expense += amt;
+          else if (t.type === '저축' || t.type === '투자') saving += amt;
+        });
+        return { income, expense, saving };
+      };
+
+      const currSums = calcSums(currTxs);
+      const prevSums = calcSums(prevTxs);
+
+      const rows = [
+        { label: '💰 총 수입', prev: prevSums.income, curr: currSums.income, isExpense: false },
+        { label: '💸 소비지출', prev: prevSums.expense, curr: currSums.expense, isExpense: true },
+        { label: '🍯 저축 · 투자', prev: prevSums.saving, curr: currSums.saving, isExpense: false }
+      ];
+
+      const tbody = document.getElementById('momTableBody');
+      tbody.innerHTML = '';
+
+      rows.forEach(r => {
+        const diff = r.curr - r.prev;
+        const rate = r.prev > 0 ? (diff / r.prev) * 100 : (r.curr > 0 ? 100 : 0);
+
+        let diffColor = 'text-cocoa-medium';
+        if (r.isExpense) {
+          // 지출은 감소하면 초록(절약), 증가하면 로즈
+          diffColor = diff > 0 ? 'text-strawberry-rose' : (diff < 0 ? 'text-emerald-600 font-bold' : 'text-cocoa-medium');
+        } else {
+          // 수입/저축은 증가하면 초록, 감소하면 로즈
+          diffColor = diff > 0 ? 'text-emerald-600 font-bold' : (diff < 0 ? 'text-strawberry-rose' : 'text-cocoa-medium');
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-cream-soft/40 transition-colors';
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-cocoa-deep font-semibold">${r.label}</td>
+          <td class="py-2.5 px-3 text-right text-cocoa-light tabular-nums">${formatCurrency(r.prev)}</td>
+          <td class="py-2.5 px-3 text-right text-cocoa-deep font-bold tabular-nums">${formatCurrency(r.curr)}</td>
+          <td class="py-2.5 px-3 text-right font-bold tabular-nums ${diffColor}">${diff > 0 ? '+' : ''}${formatCurrency(diff)}</td>
+          <td class="py-2.5 px-3 text-right font-bold tabular-nums ${diffColor}">${formatPercent(rate)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // 칭찬 배지 텍스트 동적 업데이트
+      const badge = document.getElementById('momPraiseBadge');
+      const expenseDiff = currSums.expense - prevSums.expense;
+      if (expenseDiff < 0) {
+        badge.innerHTML = `🍓 지난달보다 <span class="underline font-extrabold ml-1">${formatCurrency(Math.abs(expenseDiff))}</span> 절약 성공! 코리락쿠마가 특급 칭찬해요 🎀`;
+        badge.className = 'inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 self-start sm:self-auto';
+      } else if (expenseDiff === 0) {
+        badge.innerHTML = `🍓 지난달과 지출이 동일해요! 남은 날들도 알뜰하게 소비해봐요 🐾`;
+        badge.className = 'inline-flex items-center px-3 py-1 rounded-full bg-milk-light text-strawberry-rose text-xs font-bold border border-milk-pink self-start sm:self-auto';
+      } else {
+        badge.innerHTML = `🍓 지난달 대비 지출이 조금 늘었어요! 이번 주엔 무지출 챌린지 도전? 🍰`;
+        badge.className = 'inline-flex items-center px-3 py-1 rounded-full bg-rose-50 text-strawberry-rose text-xs font-bold border border-rose-200 self-start sm:self-auto';
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       7-3. 카드별 실적 현황판 & Chart.js 막대 차트
+       -------------------------------------------------------------------------- */
+    function renderCardPerformance(currTxs) {
+      // 결제수단별 지출 집계 (지출인 것만)
+      const payMap = {};
+      PAYMENT_METHODS.forEach(pm => {
+        payMap[pm.name] = 0;
+      });
+
+      currTxs.forEach(t => {
+        if (t.type === '지출' && payMap.hasOwnProperty(t.paymentMethod)) {
+          payMap[t.paymentMethod] += (Number(t.amount) || 0);
+        }
+      });
+
+      // 1) 좌측 프로그레스 리스트 렌더링
+      const listContainer = document.getElementById('cardPerformanceList');
+      listContainer.innerHTML = '';
+
+      const chartLabels = [];
+      const chartValues = [];
+      const chartColors = [];
+
+      PAYMENT_METHODS.forEach(pm => {
+        const spent = payMap[pm.name] || 0;
+        const target = pm.target;
+        const hasTarget = target > 0;
+        const rate = hasTarget ? Math.min(100, (spent / target) * 100) : 0;
+        const isCompleted = hasTarget && spent >= target;
+        const remain = hasTarget ? Math.max(0, target - spent) : 0;
+
+        // 차트 데이터 추가
+        chartLabels.push(pm.name.replace(' 체크카드', '').replace(' Edition2', ''));
+        chartValues.push(spent);
+        chartColors.push(pm.color || '#C94A6E');
+
+        const cardItem = document.createElement('div');
+        cardItem.className = 'p-3.5 rounded-2xl bg-cream-soft border border-cream-border hover:bg-white transition-all';
+        cardItem.innerHTML = `
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 rounded-full" style="background-color: ${pm.color}"></span>
+              <span class="font-bold text-cocoa-deep text-xs sm:text-sm">${pm.name}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-cream-ivory text-cocoa-light border border-cream-border">${pm.type}</span>
+            </div>
+            <div class="text-right">
+              ${hasTarget ? (
+                isCompleted 
+                  ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">달성 완료 🍓✨</span>`
+                  : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-milk-light text-strawberry-rose">미달 (${formatCurrency(remain)} 남음)</span>`
+              ) : `
+                <span class="text-[11px] text-cocoa-light">목표 미설정</span>
+              `}
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs text-cocoa-medium mb-1">
+            <span class="tabular-nums font-bold text-cocoa-deep">${formatCurrency(spent)}</span>
+            <span class="tabular-nums text-cocoa-light">${hasTarget ? `목표 ${formatCurrency(target)} (${rate.toFixed(0)}%)` : '실적 무관'}</span>
+          </div>
+
+          <!-- 프로그레스 바 -->
+          ${hasTarget ? `
+            <div class="w-full bg-cream-border/60 rounded-full h-2 overflow-hidden">
+              <div class="h-2 rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-gradient-to-r from-milk-pink to-strawberry-rose'}" style="width: ${rate}%"></div>
+            </div>
+          ` : `
+            <div class="w-full bg-cream-border/30 rounded-full h-1.5">
+              <div class="h-1.5 rounded-full bg-cocoa-light/40" style="width: ${spent > 0 ? '100' : '0'}%"></div>
+            </div>
+          `}
+        `;
+        listContainer.appendChild(cardItem);
+      });
+
+      // 2) 우측 Chart.js 카드별 사용액 막대 차트
+      const ctx = document.getElementById('cardBarChart').getContext('2d');
+      if (g_cardBarChart) {
+        g_cardBarChart.destroy();
+      }
+
+      g_cardBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            label: '당월 지출액',
+            data: chartValues,
+            backgroundColor: [
+              '#C94A6E', '#F4ACB7', '#F5CB5C', '#008485', 
+              '#72D1B8', '#FFE600', '#9E8E84', '#6B5B52'
+            ],
+            borderRadius: 8,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `지출: ${formatCurrency(ctx.parsed.y)}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                font: { size: 10, family: 'Pretendard' },
+                color: '#6B5B52',
+                maxRotation: 45,
+                minRotation: 0
+              }
+            },
+            y: {
+              grid: { color: '#FAF5EE' },
+              ticks: {
+                font: { size: 10, family: 'Pretendard' },
+                color: '#9E8E84',
+                callback: (val) => formatShortCurrency(val)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       7-4. 카테고리별 지출 분석 (도넛 차트 & 대분류 표)
+       -------------------------------------------------------------------------- */
+    function renderCategoryAnalysis(currTxs) {
+      const catMap = {};
+      let totalExpense = 0;
+
+      currTxs.forEach(t => {
+        if (t.type === '지출') {
+          const cat = t.majorCategory || '기타';
+          const amt = Number(t.amount) || 0;
+          catMap[cat] = (catMap[cat] || 0) + amt;
+          totalExpense += amt;
+        }
+      });
+
+      document.getElementById('totalExpenseBadge').textContent = `총 ${formatCurrency(totalExpense)}`;
+
+      // 정렬 (내림차순)
+      const sortedCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+
+      // 테이블 렌더링
+      const tbody = document.getElementById('categoryTableBody');
+      tbody.innerHTML = '';
+
+      const pastelColors = [
+        '#C94A6E', '#F4ACB7', '#F5CB5C', '#72D1B8',
+        '#A8E6CF', '#FFB7B2', '#E2F0CB', '#B5EAD7',
+        '#C7CEEA', '#9E8E84'
+      ];
+
+      const chartLabels = [];
+      const chartData = [];
+      const chartColors = [];
+
+      if (sortedCats.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-cocoa-light font-medium">당월 지출 내역이 없습니다 🍓</td></tr>`;
+      } else {
+        sortedCats.forEach(([cat, amt], idx) => {
+          const ratio = totalExpense > 0 ? (amt / totalExpense) * 100 : 0;
+          const color = pastelColors[idx % pastelColors.length];
+
+          chartLabels.push(cat);
+          chartData.push(amt);
+          chartColors.push(color);
+
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-cream-soft/40 transition-colors';
+          tr.innerHTML = `
+            <td class="py-2.5 px-3 text-cocoa-deep font-semibold flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${color}"></span>
+              <span>${cat}</span>
+            </td>
+            <td class="py-2.5 px-3 text-right font-bold text-strawberry-rose tabular-nums">${formatCurrency(amt)}</td>
+            <td class="py-2.5 px-3 text-right text-cocoa-medium tabular-nums">${ratio.toFixed(1)}%</td>
+            <td class="py-2.5 px-3 w-32">
+              <div class="w-full bg-cream-border/50 rounded-full h-2 overflow-hidden">
+                <div class="h-2 rounded-full" style="width: ${ratio}%; background-color: ${color}"></div>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Chart.js 도넛 차트
+      const ctx = document.getElementById('categoryDonutChart').getContext('2d');
+      if (g_categoryDonutChart) {
+        g_categoryDonutChart.destroy();
+      }
+
+      g_categoryDonutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: chartLabels.length > 0 ? chartLabels : ['지출 없음'],
+          datasets: [{
+            data: chartData.length > 0 ? chartData : [1],
+            backgroundColor: chartColors.length > 0 ? chartColors : ['#FAF5EE'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF',
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '68%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 10,
+                font: { size: 10, family: 'Pretendard' },
+                color: '#4A3B32'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  if (chartData.length === 0) return ' 지출 없음';
+                  const val = ctx.parsed;
+                  const ratio = totalExpense > 0 ? ((val / totalExpense) * 100).toFixed(1) : 0;
+                  return ` ${ctx.label}: ${formatCurrency(val)} (${ratio}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       7-5. 최근 12개월 추이 꺾은선 차트 (Line Chart)
+       -------------------------------------------------------------------------- */
+    function renderTrendChart() {
+      const labels = [];
+      const incomeSeries = [];
+      const expenseSeries = [];
+      const savingSeries = [];
+
+      // 기준 연월부터 과거 11개월 ~ 당월까지 12개 월
+      for (let i = 11; i >= 0; i--) {
+        const ym = getOffsetYearMonth(g_selectedMonth, -i);
+        const [y, m] = ym.split('-');
+        labels.push(`${parseInt(m, 10)}월`);
+
+        let inc = 0, exp = 0, sav = 0;
+        g_transactions.forEach(t => {
+          if (t.date.startsWith(ym)) {
+            const a = Number(t.amount) || 0;
+            if (t.type === '수입') inc += a;
+            else if (t.type === '지출') exp += a;
+            else if (t.type === '저축' || t.type === '투자') sav += a;
+          }
+        });
+
+        incomeSeries.push(inc);
+        expenseSeries.push(exp);
+        savingSeries.push(sav);
+      }
+
+      const ctx = document.getElementById('trendLineChart').getContext('2d');
+      if (g_trendLineChart) {
+        g_trendLineChart.destroy();
+      }
+
+      g_trendLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: '수입',
+              data: incomeSeries,
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.08)',
+              tension: 0.35,
+              borderWidth: 2.5,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              fill: false
+            },
+            {
+              label: '소비지출',
+              data: expenseSeries,
+              borderColor: '#C94A6E',
+              backgroundColor: 'rgba(201, 74, 110, 0.08)',
+              tension: 0.35,
+              borderWidth: 2.5,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              fill: false
+            },
+            {
+              label: '저축·투자',
+              data: savingSeries,
+              borderColor: '#F5CB5C',
+              backgroundColor: 'rgba(245, 203, 92, 0.08)',
+              tension: 0.35,
+              borderWidth: 2.5,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                font: { size: 10, family: 'Pretendard' },
+                color: '#6B5B52'
+              }
+            },
+            y: {
+              grid: { color: '#FAF5EE' },
+              ticks: {
+                font: { size: 10, family: 'Pretendard' },
+                color: '#9E8E84',
+                callback: (val) => formatShortCurrency(val)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       7-6. 거래내역 테이블 필터 및 렌더링
+       -------------------------------------------------------------------------- */
+    function applyTxFilters() {
+      const typeFilter = document.getElementById('filterType').value;
+      const paymentFilter = document.getElementById('filterPayment').value;
+      const keyword = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
+
+      // 조회월 기준 기본 필터링 후 조건 적용
+      const filtered = g_transactions.filter(t => {
+        if (!t.date.startsWith(g_selectedMonth)) return false;
+        if (typeFilter !== 'ALL' && t.type !== typeFilter) return false;
+        if (paymentFilter !== 'ALL' && t.paymentMethod !== paymentFilter) return false;
+        if (keyword) {
+          const fullText = `${t.description || ''} ${t.splitMemo || ''} ${t.majorCategory || ''} ${t.subCategory || ''}`.toLowerCase();
+          if (!fullText.includes(keyword)) return false;
+        }
+        return true;
+      });
+
+      document.getElementById('txCountBadge').textContent = `조회월 총 ${filtered.length}건의 거래 내역`;
+
+      const tbody = document.getElementById('transactionTableBody');
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-8 text-center text-cocoa-light font-medium">
+              해당 조건의 거래 내역이 없습니다 🍓
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      filtered.forEach(tx => {
+        let typeBadge = '';
+        let amountClass = 'text-cocoa-deep';
+
+        if (tx.type === '수입') {
+          typeBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">수입</span>';
+          amountClass = 'text-emerald-600 font-extrabold';
+        } else if (tx.type === '지출') {
+          typeBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-strawberry-rose border border-rose-200">지출</span>';
+          amountClass = 'text-strawberry-rose font-extrabold';
+        } else if (tx.type === '저축') {
+          typeBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">저축</span>';
+          amountClass = 'text-amber-700 font-extrabold';
+        } else {
+          typeBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200">투자</span>';
+          amountClass = 'text-teal-700 font-extrabold';
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-cream-soft/50 transition-colors group';
+        tr.innerHTML = `
+          <td class="py-3 px-3 text-cocoa-medium tabular-nums whitespace-nowrap">${tx.date.substring(5)}</td>
+          <td class="py-3 px-3">${typeBadge}</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-cocoa-deep">${tx.subCategory || tx.majorCategory}</div>
+            <div class="text-[10px] text-cocoa-light">${tx.majorCategory}</div>
+          </td>
+          <td class="py-3 px-3">
+            <div class="font-semibold text-cocoa-deep text-xs">${tx.paymentMethod}</div>
+            <div class="text-[10px] text-cocoa-light">${tx.account || '-'}</div>
+          </td>
+          <td class="py-3 px-3">
+            <div class="font-medium text-cocoa-deep">${tx.description || '-'}</div>
+            ${tx.splitMemo ? `
+              <div class="mt-0.5 inline-flex items-center px-1.5 py-0.2 text-[10px] font-bold bg-milk-light text-strawberry-rose rounded border border-milk-pink">
+                👥 ${tx.splitMemo}
+              </div>
+            ` : ''}
+          </td>
+          <td class="py-3 px-3 text-right tabular-nums ${amountClass}">
+            ${tx.type === '수입' ? '+' : (tx.type === '지출' ? '-' : '')}${formatCurrency(tx.amount)}
+          </td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="deleteTransaction('${tx.id}')" class="px-2 py-1 rounded-lg text-cocoa-light hover:text-strawberry-rose hover:bg-rose-50 transition-colors text-xs font-bold" title="삭제">
+              삭제
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ==========================================================================
+       8. 트랜잭션 CRUD 및 모달 핸들러
+       ========================================================================== */
+    function openTxModal() {
+      document.getElementById('txModal').classList.remove('hidden');
+    }
+
+    function closeTxModal() {
+      document.getElementById('txModal').classList.add('hidden');
+    }
+
+    function handleTxSubmit(e) {
+      e.preventDefault();
+
+      const date = document.getElementById('inputDate').value;
+      const type = document.getElementById('inputType').value;
+      const majorCategory = document.getElementById('inputMajorCategory').value;
+      const subCategory = document.getElementById('inputSubCategory').value;
+      const paymentMethod = document.getElementById('inputPaymentMethod').value;
+      const account = document.getElementById('inputAccount').value;
+      const amount = Number(document.getElementById('inputAmount').value) || 0;
+      const description = document.getElementById('inputDescription').value.trim();
+      const splitMemo = document.getElementById('inputSplitMemo').value.trim();
+
+      if (amount <= 0) {
+        alert('금액을 올바르게 입력해주세요.');
+        return;
+      }
+
+      const newTx = {
+        id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        date,
+        type,
+        majorCategory,
+        subCategory,
+        paymentMethod,
+        account,
+        amount,
+        description,
+        splitMemo
+      };
+
+      // 목록 상단 추가
+      g_transactions.unshift(newTx);
+      saveTransactions();
+
+      // 연결 계좌 잔액 자동 반영
+      if (account) {
+        const targetAcc = g_assets.find(a => a.name === account);
+        if (targetAcc) {
+          if (type === '수입') targetAcc.balance += amount;
+          else if (type === '지출') targetAcc.balance = Math.max(0, targetAcc.balance - amount);
+          else if (type === '저축' || type === '투자') targetAcc.balance += amount;
+          saveAssets();
+        }
+      }
+
+      // 등록 축하 컨페티 효과 🍓
+      if (window.confetti) {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#C94A6E', '#F4ACB7', '#FFE5EC', '#72D1B8']
+        });
+      }
+
+      closeTxModal();
+      document.getElementById('inputAmount').value = '';
+      document.getElementById('inputDescription').value = '';
+      document.getElementById('inputSplitMemo').value = '';
+
+      // 등록된 날짜의 연월로 조회월 자동 이동 (필요시)
+      const txYM = date.substring(0, 7);
+      if (txYM !== g_selectedMonth) {
+        changeMonth(txYM);
+      } else {
+        renderAll();
+      }
+    }
+
+    function deleteTransaction(id) {
+      if (!confirm('정말 이 거래 내역을 삭제하시겠어요? 🍓')) return;
+      g_transactions = g_transactions.filter(t => t.id !== id);
+      saveTransactions();
+      renderAll();
+    }
+
+    /* ==========================================================================
+       9. 자산 모달 및 잔액 관리 핸들러
+       ========================================================================== */
+    function openAssetModal() {
+      renderAssetModalContent();
+      document.getElementById('assetModal').classList.remove('hidden');
+    }
+
+    function closeAssetModal() {
+      document.getElementById('assetModal').classList.add('hidden');
+    }
+
+    function renderAssetModalContent() {
+      let total = 0;
+      let dep = 0, park = 0, sav = 0, inv = 0;
+
+      g_assets.forEach(acc => {
+        const bal = Number(acc.balance) || 0;
+        total += bal;
+        if (acc.group === '입출금') dep += bal;
+        else if (acc.group === '파킹/비상금') park += bal;
+        else if (acc.group === '적금/청약') sav += bal;
+        else if (acc.group === '투자/증권') inv += bal;
+      });
+
+      document.getElementById('modalTotalAsset').textContent = formatCurrency(total);
+      document.getElementById('subTotalDeposit').textContent = formatCurrency(dep);
+      document.getElementById('subTotalParking').textContent = formatCurrency(park);
+      document.getElementById('subTotalSaving').textContent = formatCurrency(sav);
+      document.getElementById('subTotalInvest').textContent = formatCurrency(inv);
+
+      // 계좌 리스트 렌더링
+      const container = document.getElementById('assetAccountList');
+      container.innerHTML = '';
+
+      g_assets.forEach(acc => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-3 rounded-2xl bg-cream-soft border border-cream-border';
+        div.innerHTML = `
+          <div>
+            <div class="font-bold text-cocoa-deep">${acc.name}</div>
+            <div class="text-[10px] text-cocoa-light font-medium">${acc.group}</div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="number" id="acc_input_${acc.id}" value="${acc.balance}" class="w-32 sm:w-36 px-2.5 py-1.5 text-right font-extrabold text-cocoa-deep bg-white border border-cream-border rounded-xl focus:outline-none focus:ring-1 focus:ring-strawberry-rose tabular-nums text-xs sm:text-sm">
+            <span class="text-xs font-bold text-cocoa-medium">원</span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function saveAssetBalances() {
+      g_assets.forEach(acc => {
+        const input = document.getElementById(`acc_input_${acc.id}`);
+        if (input) {
+          acc.balance = Math.max(0, Number(input.value) || 0);
+        }
+      });
+
+      saveAssets();
+      renderAssetModalContent();
+      alert('자산 잔액이 성공적으로 업데이트되었습니다! 🍓✨');
+    }
+
+    /* ==========================================================================
+       10. 초기 데이터 리셋
+       ========================================================================== */
+    function resetAllDataConfirm() {
+      if (!confirm('초기 샘플 데이터로 복구하시겠습니까? 현재 입력된 모든 내역이 초기화됩니다.')) return;
+      g_transactions = generateSampleTransactions();
+      g_assets = JSON.parse(JSON.stringify(INITIAL_ASSETS));
+      saveTransactions();
+      saveAssets();
+      initFormOptions();
+      renderAll();
+      alert('코리락쿠마 샘플 데이터로 복구 완료되었습니다! 🍓');
+    }
+
+    // 창 로드 시 실행
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
